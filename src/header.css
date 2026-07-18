@@ -47,4 +47,8 @@
   .hero h1 { font-size: clamp(32px, 8.8vw, 52px); margin-top: 30px; }
   .hero-line { gap: clamp(7px, 1.8vw, 12px); }
   .hero-line--green { margin-top: .38em; }
+  .hero h1 { text-shadow: none !important; }
+  .hero .terminal,
+  .hero .honesty { box-shadow: none !important; }
+  .hero-cta { box-shadow: 12px 12px 0 #FFFF00 !important; }
 }
