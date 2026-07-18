@@ -1,10 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Comic+Neue:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Roboto+Mono:wght@400;500;600;700&display=swap');
 
-body,
-input,
-textarea,
-select {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+* {
+  font-family: 'Roboto Mono', Arial, sans-serif;
 }
 
 h1,
@@ -33,7 +30,7 @@ form > label,
 .verdict p,
 .autopsy > p,
 .score em {
-  font-family: 'Comic Neue', 'Comic Sans MS', cursive !important;
+  font-family: Bangers, Arial, sans-serif !important;
 }
 
 .terminal,
@@ -44,7 +41,7 @@ form > label,
 .review-grid small,
 .review-grid em,
 footer > small {
-  font-family: 'IBM Plex Mono', 'Courier New', monospace !important;
+  font-family: 'Roboto Mono', Arial, sans-serif !important;
 }
 
 /* Give the two-line hero message room to breathe on every screen size. */
