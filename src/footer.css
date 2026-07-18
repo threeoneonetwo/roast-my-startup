@@ -5,6 +5,7 @@ footer {
 }
 
 .footer-logo {
+  font-family: Impact, Charcoal, sans-serif;
   font-size: clamp(58px, 10vw, 142px);
   line-height: .82;
   letter-spacing: -5px;
