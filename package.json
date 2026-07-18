@@ -10,10 +10,13 @@
     "deploy": "npm run build && wrangler pages deploy dist --project-name=roast-my-startup --branch=main"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vitejs/plugin-react": "latest",
     "react": "latest",
     "react-dom": "latest",
     "vite": "latest"
   },
-  "devDependencies": { "wrangler": "^4.112.0" }
+  "devDependencies": {
+    "wrangler": "^4.112.0"
+  }
 }
