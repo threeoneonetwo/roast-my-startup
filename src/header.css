@@ -25,7 +25,7 @@
 
 .hero h1 {
   margin-top: 34px;
-  line-height: 1;
+  line-height: .88;
   font-size: clamp(56px, 11.5vw, 150px);
 }
 
@@ -38,7 +38,7 @@
 }
 
 .hero-line--yellow { color: #FFFF00 !important; }
-.hero-line--green { color: #39FF14 !important; margin-top: .3em; }
+.hero-line--green { color: #39FF14 !important; margin-top: .16em; }
 .hero-line--yellow > span { color: #FFFF00 !important; }
 .hero-line--green > span { color: #39FF14 !important; }
 
@@ -47,7 +47,7 @@
   .site-header__brand { font-size: clamp(26px, 9vw, 42px); }
   .hero h1 { font-size: clamp(36px, 10.2vw, 52px); margin-top: 30px; }
   .hero-line { gap: clamp(5px, 1.4vw, 10px); }
-  .hero-line--green { margin-top: .38em; }
+  .hero-line--green { margin-top: .2em; }
   .hero h1 { text-shadow: none !important; }
   .hero .terminal,
   .hero .honesty { box-shadow: none !important; }
