@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import './footer.css';
+import './comic-fix.css';
 
 const roasts = [
   ["a 'Web3' visionary", "It's Uber but for goldfish, on the blockchain", 'You built a database and called it a revolution. The goldfish deserve better.', 'nobody asked 🐟', '#39FF14', '🤡'],

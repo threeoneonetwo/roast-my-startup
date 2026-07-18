@@ -1,0 +1,17 @@
+/* Replace Comic Sans with a consistent, readable sans-serif treatment. */
+.hero-sub,
+.warnings div:nth-child(2),
+.form-section > p,
+.field label,
+form > label,
+.roast-card q,
+.reviews > p,
+.review-grid q,
+.footer-credit,
+.verdict p,
+.autopsy > p,
+.score em {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-style: normal;
+  font-weight: 700;
+}
