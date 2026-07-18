@@ -12,11 +12,13 @@ h2,
 h3,
 button,
 .hero-cta,
+.marquee,
+.warnings div:last-child,
 .footer-logo,
 .roast-card strong,
 .score b,
 .final {
-  font-family: Anton, Impact, sans-serif;
+  font-family: Anton, Impact, sans-serif !important;
   font-weight: 400;
 }
 
@@ -31,5 +33,27 @@ form > label,
 .verdict p,
 .autopsy > p,
 .score em {
-  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive !important;
+}
+
+.terminal,
+.honesty,
+.warnings div:first-child,
+.roast-card small,
+.roast-card em,
+.review-grid small,
+.review-grid em,
+footer > small {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace !important;
+}
+
+/* Give the two-line hero message room to breathe on every screen size. */
+h1 {
+  line-height: 1.03 !important;
+  margin-top: 30px !important;
+}
+
+h1 span {
+  display: inline-block;
+  margin-top: .16em;
 }
