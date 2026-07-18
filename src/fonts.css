@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Comic+Neue:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+body,
+input,
+textarea,
+select {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+h1,
+h2,
+h3,
+button,
+.hero-cta,
+.footer-logo,
+.roast-card strong,
+.score b,
+.final {
+  font-family: Anton, Impact, sans-serif;
+  font-weight: 400;
+}
+
+.hero-sub,
+.form-section > p,
+.field label,
+form > label,
+.roast-card q,
+.review-grid q,
+.reviews > p,
+.footer-credit,
+.verdict p,
+.autopsy > p,
+.score em {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+}
