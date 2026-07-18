@@ -5,6 +5,85 @@
   font-family: Arial, Helvetica, sans-serif !important;
 }
 
+body {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+button,
+.hero-cta,
+.marquee,
+.footer-logo,
+.roast-card strong,
+.score b,
+.final {
+  font-weight: 900 !important;
+  letter-spacing: -.045em;
+}
+
+h1 {
+  font-size: clamp(48px, 12vw, 150px) !important;
+  letter-spacing: -.065em;
+}
+
+.marquee {
+  font-size: clamp(15px, 3.2vw, 22px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .025em;
+}
+
+.hero-sub,
+.form-section > p,
+.footer-credit,
+.verdict p,
+.autopsy > p {
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+}
+
+.form-section > h2,
+.graveyard h2,
+.reviews h2 {
+  font-size: clamp(36px, 8vw, 86px) !important;
+  line-height: .98 !important;
+}
+
+.field label,
+form > label {
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px !important;
+  line-height: 1.35;
+}
+
+.roast-card q,
+.review-grid q,
+.verdict p,
+.tear p,
+.local p {
+  font-size: clamp(16px, 4.4vw, 19px) !important;
+  line-height: 1.45 !important;
+}
+
+.roast-card small,
+.roast-card em,
+.review-grid small,
+.review-grid em,
+footer > small {
+  font-size: clamp(12px, 3.2vw, 15px) !important;
+  line-height: 1.45 !important;
+}
+
 /* Give the two-line hero message room to breathe on every screen size. */
 h1 {
   line-height: 1.03 !important;
@@ -14,4 +93,11 @@ h1 {
 h1 span {
   display: inline-block;
   margin-top: .16em;
+}
+
+@media (max-width: 560px) {
+  .hero-sub { font-size: 19px !important; }
+  .hero-cta { font-size: 31px !important; letter-spacing: -.03em; }
+  .warnings div { font-size: 14px !important; line-height: 1.25; }
+  .footer-logo { letter-spacing: -.04em !important; }
 }
