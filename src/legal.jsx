@@ -9,7 +9,7 @@ function LegalHeader() {
 }
 
 function LegalFooter() {
-  return <footer className="legal-footer"><nav aria-label="Legal"><a href="/">Home</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a></nav><p>© 2026 Roast My Startup — an independent project by Vansh Pandita.</p></footer>;
+  return <footer className="legal-footer"><nav aria-label="Legal"><a href="/">Home</a><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a></nav><p>© 2026 Roast My Startup. An independent project by Vansh Pandita.</p></footer>;
 }
 
 function PrivacyPolicy() {
@@ -22,13 +22,13 @@ function PrivacyPolicy() {
 
     <section><h2>2. Information you provide</h2><p>To generate a roast, the site asks for your startup idea, founder background, first name, age range, experience level, and city or country. This information may identify you, especially when combined with a distinctive business idea.</p><p>We do not ask for an email address, last name, password, payment information, or LinkedIn URL. Please do not place those details inside another field.</p></section>
 
-    <section><h2>3. OpenAI processing</h2><p>The submitted fields are sent through a Vercel serverless function to the OpenAI API. OpenAI generates the roast and may use web search to find current market or competitor information. Search queries may therefore be derived from details in your submission.</p><p>The API request is configured with <code>store: false</code>, so Roast My Startup does not ask OpenAI to retain response application state. OpenAI states that API data is not used to train its models unless the API customer opts in. Under OpenAI's default controls, prompts and responses may still appear in abuse-monitoring logs retained for up to 30 days, or longer when legally or safety-required. Read <a href="https://developers.openai.com/api/docs/guides/your-data" target="_blank" rel="noreferrer">OpenAI's API data controls</a>.</p></section>
+    <section><h2>3. OpenAI processing</h2><p>The submitted fields are sent through a Vercel serverless function to the OpenAI API. OpenAI generates the roast and may use web search to find current market or competitor information. Search queries may therefore be derived from details in your submission.</p><p>The API request is configured with <code>store: false</code>, so Roast My Startup does not ask OpenAI to retain response application state. OpenAI states that API data is not used to train its models unless the API customer opts in. Under OpenAI's default controls, prompts and responses may still appear in abuse monitoring logs retained for up to 30 days, or longer when legally required or needed for safety. Read <a href="https://developers.openai.com/api/docs/guides/your-data" target="_blank" rel="noreferrer">OpenAI's API data controls</a>.</p></section>
 
     <section><h2>4. What Roast My Startup stores</h2><p>Roast My Startup has no user accounts and no application database for submissions or generated roasts. The generated result is saved in your browser's <code>sessionStorage</code> so the autopsy page survives navigation in that tab. Starting another roast, clearing site data, or ending the browser session removes that browser copy.</p><p>Infrastructure providers may retain security, request, and operational logs according to their own settings and legal obligations. We do not deliberately write startup submissions to application logs.</p></section>
 
-    <section><h2>5. Analytics</h2><h3>PostHog</h3><p>PostHog records page views, page exits, and product events such as starting, submitting, completing, failing, or sharing a roast. Event properties are limited to coarse idea/background length buckets, model name, and sharing channel. Autocapture and session recording are disabled. We do not intentionally send startup text, founder names, locations, or other form contents to PostHog. PostHog may use browser storage and receive ordinary technical information required to process analytics. See <a href="https://posthog.com/privacy" target="_blank" rel="noreferrer">PostHog's privacy policy</a>.</p><h3>Vercel Web Analytics</h3><p>Vercel Web Analytics records aggregated page information including timestamp, page URL, referrer, coarse geolocation, browser, operating system, and device type. Vercel says these analytics do not use third-party cookies or associate page views with an identifiable person or IP address. See <a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noreferrer">Vercel Analytics privacy information</a>.</p></section>
+    <section><h2>5. Analytics</h2><h3>PostHog</h3><p>PostHog records page views, page exits, and product events such as starting, submitting, completing, failing, or sharing a roast. Event properties are limited to coarse idea and background length buckets, model name, and sharing channel. Autocapture and session recording are disabled. We do not intentionally send startup text, founder names, locations, or other form contents to PostHog. PostHog may use browser storage and receive ordinary technical information required to process analytics. See <a href="https://posthog.com/privacy" target="_blank" rel="noreferrer">PostHog's privacy policy</a>.</p><h3>Vercel Web Analytics</h3><p>Vercel Web Analytics records aggregated page information including timestamp, page URL, referrer, coarse geolocation, browser, operating system, and device type. Vercel says these analytics do not use third party cookies or associate page views with an identifiable person or IP address. See <a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noreferrer">Vercel Analytics privacy information</a>.</p></section>
 
-    <section className="legal-warning"><h2>6. Do not submit confidential information</h2><p>Do not submit trade secrets, unreleased inventions, customer lists, credentials, financial account data, health information, government identifiers, private third-party information, or anything covered by an NDA. If losing control of the information would damage you or your company, do not feed it to the roast machine.</p></section>
+    <section className="legal-warning"><h2>6. Do not submit confidential information</h2><p>Do not submit trade secrets, unreleased inventions, customer lists, credentials, financial account data, health information, government identifiers, private third party information, or anything covered by an NDA. If losing control of the information would damage you or your company, do not feed it to the roast machine.</p></section>
 
     <section><h2>7. Sharing</h2><p>If you use a share button, your browser or the selected social platform receives the content you choose to share. Sharing is optional and is governed by that platform's privacy terms.</p></section>
 
@@ -42,7 +42,7 @@ function Terms() {
   return <>
     <h1>TERMS OF USE</h1>
     <p className="legal-date">Effective: July 20, 2026</p>
-    <aside><strong>The short version:</strong> this is an AI-generated comedy roast, not a consultant, lawyer, accountant, therapist, oracle, or substitute for customer research. Verify anything important before using it to make a decision.</aside>
+    <aside><strong>The short version:</strong> this is an AI generated comedy roast, not a consultant, lawyer, accountant, therapist, oracle, or substitute for customer research. Verify anything important before using it to make a decision.</aside>
 
     <section><h2>1. Acceptance and eligibility</h2><p>By using Roast My Startup, you agree to these Terms and the <a href="/privacy">Privacy Policy</a>. You must be at least 18 years old and legally able to agree to these Terms.</p></section>
 
@@ -50,7 +50,7 @@ function Terms() {
 
     <section><h2>3. AI output can be wrong</h2><p>Roasts may be inaccurate, incomplete, outdated, offensive, repetitive, or based on misunderstood context. Sources may not support every inference. Scores are theatrical opinions, not valuations or predictions. You are responsible for checking facts and obtaining qualified professional advice before making business, legal, financial, employment, or investment decisions.</p></section>
 
-    <section className="legal-warning"><h2>4. No confidential information</h2><p>You must not submit trade secrets, credentials, private customer data, regulated data, unreleased patentable details, NDA-protected material, or sensitive information about yourself or another person. Only submit content you are permitted to process through third-party AI and hosting providers.</p></section>
+    <section className="legal-warning"><h2>4. No confidential information</h2><p>You must not submit trade secrets, credentials, private customer data, regulated data, unreleased patentable details, material protected by an NDA, or sensitive information about yourself or another person. Only submit content you are permitted to process through third party AI and hosting providers.</p></section>
 
     <section><h2>5. Your content</h2><p>You retain whatever rights you have in your submission. You give Roast My Startup a limited permission to transmit and process that submission solely to operate, secure, troubleshoot, and improve the service as described in the Privacy Policy. You confirm that your submission does not violate another person's rights or applicable law.</p></section>
 
@@ -72,7 +72,7 @@ export default function LegalPage({ type }) {
   useEffect(() => {
     const path = privacy ? '/privacy' : '/terms';
     const title = privacy ? 'Privacy Policy | Roast My Startup' : 'Terms of Use | Roast My Startup';
-    const description = privacy ? 'How Roast My Startup processes submissions and analytics data.' : 'Terms for using Roast My Startup and its AI-generated roasts.';
+    const description = privacy ? 'How Roast My Startup processes submissions and analytics data.' : 'Terms for using Roast My Startup and its AI generated roasts.';
     document.title = title;
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.content = description;

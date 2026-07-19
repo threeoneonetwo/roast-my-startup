@@ -82,6 +82,14 @@ footer.legal-footer nav a {
   margin: 0;
   padding: 10px 16px;
   font-size: 16px;
+  box-shadow: 0 0 #000;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+footer.legal-footer nav a:hover,
+footer.legal-footer nav a:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 5px 5px #000;
 }
 
 .legal-footer p {

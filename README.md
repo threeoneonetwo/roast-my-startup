@@ -1,6 +1,6 @@
 # Roast My Startup
 
-Roast My Startup is a brutal feedback tool for founders who want honest critique instead of empty validation. Submit a startup idea and receive an unapologetically harsh, occasionally funny roast.
+Get honest feedback on your startup idea, business plan, and strategy. No fluff. No false hope.
 
 ## Run locally
 

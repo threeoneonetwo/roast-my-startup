@@ -69,6 +69,7 @@ RESEARCH AND TRUTH RULES
 - Never expose or mention private contact details.
 
 ROAST RULES
+- Do not use em dashes, en dashes, or hyphens in any generated heading or paragraph. Use periods, commas, colons, or separate words instead.
 - Find the core delusion: the inconsistency the founder is most likely refusing to confront.
 - Be properly rude, playful, blunt, sarcastic, surprising, and specific. It should be entertaining enough that the founder wants to share it even while reconsidering their life choices.
 - Vary the comedic device and rhythm. You may frame sections as an obituary, courtroom charge, medical diagnosis, investor group chat, intervention, product review, nature documentary, performance appraisal, or another format inspired by the submission.
@@ -91,6 +92,17 @@ The finished result must be approximately 80% savage entertainment and 20% usefu
 
 function clean(value, maxLength) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
+}
+
+function withoutDashes(value) {
+  if (typeof value !== 'string') return value;
+  return value
+    .replace(/[—–]/g, '. ')
+    .replace(/\s+-\s+/g, '. ')
+    .replace(/([A-Za-z])[-‐]([A-Za-z])/g, '$1 $2')
+    .replace(/(\d)\s*-\s*(\d)/g, '$1 to $2')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 export default async function handler(req, res) {
@@ -178,13 +190,13 @@ export default async function handler(req, res) {
         first,
         loc: submission.location || 'your undisclosed bunker',
         score: Math.max(0, Math.min(100, Math.round(Number(generated.score) || 0))),
-        greet: generated.greeting,
-        verdictTitle: generated.verdictTitle,
-        verdict: generated.verdict,
-        sections: blocks.map((block, index) => [block.title, SECTION_COLORS[index % SECTION_COLORS.length], block.body]),
-        localTitle: generated.localRealityTitle,
-        local: generated.localReality,
-        final: generated.finalLine,
+        greet: withoutDashes(generated.greeting),
+        verdictTitle: withoutDashes(generated.verdictTitle),
+        verdict: withoutDashes(generated.verdict),
+        sections: blocks.map((block, index) => [withoutDashes(block.title), SECTION_COLORS[index % SECTION_COLORS.length], withoutDashes(block.body)]),
+        localTitle: withoutDashes(generated.localRealityTitle),
+        local: withoutDashes(generated.localReality),
+        final: withoutDashes(generated.finalLine),
         sources,
       },
       model: MODEL,
