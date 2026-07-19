@@ -1,5 +1,5 @@
-const MODEL = 'claude-sonnet-5';
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'gpt-5.6-sol';
+const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const SECTION_COLORS = ['#FFFF00', '#39FF14', '#FF10F0'];
 
 const outputSchema = {
@@ -53,8 +53,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(503).json({ error: 'Claude is not configured yet.' });
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ error: 'The roast engine is not configured yet.' });
   }
 
   const submission = {
@@ -76,37 +76,42 @@ export default async function handler(req, res) {
   const timeout = setTimeout(() => controller.abort(), 45000);
 
   try {
-    const anthropicResponse = await fetch(ANTHROPIC_URL, {
+    const openAIResponse = await fetch(OPENAI_URL, {
       method: 'POST',
       signal: controller.signal,
       headers: {
         'content-type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 3000,
-        thinking: { type: 'disabled' },
-        system: systemPrompt,
-        messages: [{
-          role: 'user',
-          content: `Roast this startup based only on the following founder submission:\n${JSON.stringify(submission, null, 2)}`,
-        }],
-        output_config: { format: { type: 'json_schema', schema: outputSchema } },
+        reasoning: { effort: 'low' },
+        max_output_tokens: 5000,
+        instructions: systemPrompt,
+        input: `Roast this startup based only on the following founder submission:\n${JSON.stringify(submission, null, 2)}`,
+        text: {
+          verbosity: 'medium',
+          format: {
+            type: 'json_schema',
+            name: 'startup_roast',
+            strict: true,
+            schema: outputSchema,
+          },
+        },
       }),
     });
 
-    const payload = await anthropicResponse.json();
-    if (!anthropicResponse.ok) {
-      console.error('Anthropic request failed', anthropicResponse.status, payload?.error?.type, payload?.error?.message);
-      return res.status(502).json({ error: 'Claude refused to clock in. Try again in a moment.' });
+    const payload = await openAIResponse.json();
+    if (!openAIResponse.ok) {
+      console.error('OpenAI request failed', openAIResponse.status, payload?.error?.type, payload?.error?.message);
+      return res.status(502).json({ error: 'The roast engine refused to clock in. Try again in a moment.' });
     }
 
-    const text = payload.content?.find((block) => block.type === 'text')?.text;
+    const text = payload.output?.flatMap((item) => item.content || []).find((content) => content.type === 'output_text')?.text;
+    if (!text) throw new Error('OpenAI returned no structured roast.');
     const generated = JSON.parse(text);
     const blocks = Array.isArray(generated.roastBlocks) ? generated.roastBlocks.slice(0, 6) : [];
-    if (!blocks.length) throw new Error('Claude returned no roast blocks.');
+    if (!blocks.length) throw new Error('OpenAI returned no roast blocks.');
 
     const first = submission.firstName || 'founder';
     return res.status(200).json({
@@ -125,7 +130,7 @@ export default async function handler(req, res) {
   } catch (error) {
     const timedOut = error?.name === 'AbortError';
     console.error('Roast generation failed', timedOut ? 'timeout' : error?.name);
-    return res.status(timedOut ? 504 : 500).json({ error: timedOut ? 'Claude took too long. Try again.' : 'The roast caught fire. Try again.' });
+    return res.status(timedOut ? 504 : 500).json({ error: timedOut ? 'The roast took too long. Try again.' : 'The roast caught fire. Try again.' });
   } finally {
     clearTimeout(timeout);
   }
