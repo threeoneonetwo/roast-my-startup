@@ -1,6 +1,7 @@
 .site-header {
-  position: relative;
-  z-index: 12;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,6 +9,11 @@
   padding: 14px 20px;
   background: #000;
   border-bottom: 5px solid #39FF14;
+}
+
+/* Keep the brand visible while the full-screen autopsy is open. */
+.overlay {
+  top: 72px;
 }
 
 .site-header__brand {
@@ -48,6 +54,7 @@
 
 @media (max-width: 560px) {
   .site-header { min-height: 58px; padding: 11px 14px; }
+  .overlay { top: 58px; }
   .site-header__brand { font-size: clamp(26px, 9vw, 42px); }
   .hero h1 { font-size: clamp(38px, 10.7vw, 56px); margin-top: 30px; }
   .hero-line { gap: clamp(4px, 1.2vw, 8px); }
