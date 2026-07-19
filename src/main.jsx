@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
+import { trackProductEvent } from './product-analytics';
 import './styles.css';
 import './footer.css';
 import './comic-fix.css';
@@ -38,10 +39,12 @@ function buildRoast({ first, loc, idea }) {
 }
 function Marquee({ children, red = false }) { return <div className={'marquee ' + (red ? 'red' : '')}><div>{children} &nbsp; {children}</div></div> }
 function App() {
-  const [form, setForm] = useState({ idea: '', first: '', loc: '' }); const [result, setResult] = useState(null); const [hover, setHover] = useState(false); const [confetti, setConfetti] = useState([]);
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const submit = (e) => { e.preventDefault(); setResult(buildRoast(form)); setConfetti(Array.from({ length: 90 }, (_, i) => ({ id: Date.now()+i, left: Math.random()*100, delay: Math.random()*.5, emoji: Math.random()<.35 ? pick(['🔥','💀','🤡','☠️','🚫','📉']) : '' }))); window.scrollTo(0, 0); setTimeout(() => setConfetti([]), 4300); };
-  const close = () => { setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const [form, setForm] = useState({ idea: '', first: '', loc: '' }); const [result, setResult] = useState(null); const [hover, setHover] = useState(false); const [confetti, setConfetti] = useState([]); const [formStarted, setFormStarted] = useState(false); const submitted = useRef(false);
+  const onChange = (e) => { startForm(); setForm({ ...form, [e.target.name]: e.target.value }); };
+  const startForm = () => { if (!formStarted) { setFormStarted(true); trackProductEvent('form_started'); } };
+  useEffect(() => { const trackAbandon = () => { if (formStarted && !submitted.current) trackProductEvent('form_abandoned'); }; window.addEventListener('pagehide', trackAbandon); return () => window.removeEventListener('pagehide', trackAbandon); }, [formStarted]);
+  const submit = (e) => { e.preventDefault(); submitted.current = true; const ideaLength = form.idea.trim().split(/\s+/).filter(Boolean).length; trackProductEvent('roast_submitted', { idea_length: ideaLength < 20 ? 'short' : ideaLength < 80 ? 'medium' : 'long' }); trackProductEvent('roast_viewed'); setResult(buildRoast(form)); setConfetti(Array.from({ length: 90 }, (_, i) => ({ id: Date.now()+i, left: Math.random()*100, delay: Math.random()*.5, emoji: Math.random()<.35 ? pick(['🔥','💀','🤡','☠️','🚫','📉']) : '' }))); window.scrollTo(0, 0); setTimeout(() => setConfetti([]), 4300); };
+  const close = () => { trackProductEvent('roast_another_clicked'); submitted.current = false; setFormStarted(false); setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   return <main><Analytics /><header className="site-header"><div className="site-header__brand">ROAST<span>.</span>MY<span>.</span>STARTUP</div></header><Marquee>🔥 YOUR STARTUP SUCKS 🔥 GET DESTROYED 🔥 NO REFUNDS 🔥 YOUR MOM LIED TO YOU 🔥 WE FIND WHAT EVERYONE'S TOO POLITE TO MENTION 🔥</Marquee>
     <section className="hero"><i className="spin left">☢️</i><i className="spin rev right">💀</i><div className="terminal">&gt; SYSTEM READY. FEELINGS: NOT FOUND_</div><h1><span className="hero-line hero-line--yellow"><span>YOUR</span><span>STARTUP</span><span>SUCKS</span></span><span className="hero-line hero-line--green"><span>AND</span><span>WE'LL</span><span>PROVE IT</span></span></h1><p className="hero-sub">Get honest feedback that doesn't care about your feelings</p><div className="honesty">// yes, this design is intentionally hideous. your startup idea deserves <b>HONESTY, not polish</b>. if we made it pretty you'd trust the compliments. you won't get any.</div><a href="#roastform" className="hero-cta">👇 ROAST ME NOW 👇</a></section>
     <section className="warnings"><div>⚠️ WARNING: This will hurt your feelings</div><div>✋ DISCLAIMER: We're not liable if your idea actually sucks</div><div>🎯 GUARANTEE: You'll laugh, cringe & learn nothing</div></section>
