@@ -71,6 +71,8 @@ footer > small b {
   margin: 48px auto 0;
   font: 700 clamp(14px, 1.3vw, 20px)/1.5 Arial, Helvetica, sans-serif;
   text-transform: none;
+  animation: none;
+  transform: none;
 }
 
 footer .footer-legal a {
