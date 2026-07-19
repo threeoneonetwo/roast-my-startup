@@ -40,14 +40,15 @@
   box-shadow: 4px 4px #000;
 }
 
+.share-roast__buttons button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .share-roast__buttons .share-roast__x {
   color: #39ff14;
   background: #000;
   border-color: #ffff00;
-}
-
-.share-roast__buttons .share-roast__copy {
-  background: #ffff00;
 }
 
 .share-roast > small {
