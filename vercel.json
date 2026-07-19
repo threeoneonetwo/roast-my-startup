@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/roast", "destination": "/index.html" },
-    { "source": "/autopsy", "destination": "/index.html" },
-    { "source": "/graveyard", "destination": "/index.html" },
-    { "source": "/reviews", "destination": "/index.html" }
-  ]
-}

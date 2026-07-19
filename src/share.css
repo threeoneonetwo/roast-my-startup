@@ -69,31 +69,3 @@
     width: 100%;
   }
 }
-
-.autopsy-empty {
-  min-height: calc(100vh - 72px);
-  padding: 100px 20px;
-  text-align: center;
-  background: #000;
-}
-
-.autopsy-empty h2 {
-  color: #ffff00;
-  margin: 0;
-  font: clamp(48px, 10vw, 110px)/0.9 Impact, Charcoal, sans-serif;
-  -webkit-text-stroke: 3px #ff0040;
-}
-
-.autopsy-empty p {
-  color: #39ff14;
-  font-size: clamp(18px, 3vw, 28px);
-}
-
-.autopsy-empty button {
-  color: #fff;
-  background: #ff0040;
-  border: 5px solid #ffff00;
-  cursor: pointer;
-  padding: 18px 28px;
-  font: clamp(24px, 4vw, 38px) Impact, Charcoal, sans-serif;
-}

@@ -6,7 +6,7 @@ if (projectKey) {
   posthog.init(projectKey, {
     api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
     autocapture: false,
-    capture_pageview: 'history_change',
+    capture_pageview: true,
     capture_pageleave: true,
     person_profiles: 'identified_only',
   });
