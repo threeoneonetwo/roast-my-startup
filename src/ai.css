@@ -16,3 +16,50 @@
   font-weight: 900;
   text-align: center;
 }
+
+.overlay.overlay--page {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  min-height: calc(100vh - 72px);
+  overflow: visible;
+}
+
+.missing-roast {
+  min-height: calc(100vh - 72px);
+  display: grid;
+  place-content: center;
+  gap: 1.25rem;
+  padding: 2rem;
+  text-align: center;
+  background: #000;
+}
+
+.missing-roast h1 {
+  margin: 0;
+  color: #ffff00;
+  font-size: clamp(3rem, 10vw, 7rem);
+}
+
+.missing-roast p {
+  max-width: 650px;
+  margin: 0 auto;
+  color: #39ff14;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 800;
+}
+
+.missing-roast button {
+  justify-self: center;
+  border: 5px solid #ffff00;
+  background: #ff0040;
+  color: #fff;
+  padding: .8rem 1.4rem;
+  cursor: pointer;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+}
+
+@media (max-width: 560px) {
+  .overlay.overlay--page,
+  .missing-roast { min-height: calc(100vh - 58px); }
+}

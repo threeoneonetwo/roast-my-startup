@@ -11,11 +11,6 @@
   border-bottom: 5px solid #39FF14;
 }
 
-/* Keep the brand visible while the full-screen autopsy is open. */
-.overlay {
-  top: 72px;
-}
-
 .site-header__brand {
   font-family: Impact, Charcoal, sans-serif;
   color: #fff;
@@ -24,6 +19,7 @@
   letter-spacing: -.045em;
   white-space: nowrap;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .site-header__brand span { color: #FF0040; }
@@ -54,7 +50,6 @@
 
 @media (max-width: 560px) {
   .site-header { min-height: 58px; padding: 11px 14px; }
-  .overlay { top: 58px; }
   .site-header__brand { font-size: clamp(26px, 9vw, 42px); }
   .hero h1 { font-size: clamp(38px, 10.7vw, 56px); margin-top: 30px; }
   .hero-line { gap: clamp(4px, 1.2vw, 8px); }
