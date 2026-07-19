@@ -8,6 +8,7 @@ if (projectKey) {
     autocapture: false,
     capture_pageview: true,
     capture_pageleave: true,
+    disable_session_recording: true,
     person_profiles: 'identified_only',
   });
 }

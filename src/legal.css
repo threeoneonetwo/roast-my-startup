@@ -1,0 +1,102 @@
+.legal-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 72px 24px 90px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.legal-page h1 {
+  margin: 0;
+  color: var(--yellow);
+  font-size: clamp(54px, 10vw, 108px);
+  line-height: .9;
+  text-align: center;
+  text-shadow: 8px 8px var(--red);
+}
+
+.legal-date {
+  margin: 26px 0 42px;
+  color: var(--green);
+  font-weight: 800;
+  text-align: center;
+}
+
+.legal-page aside {
+  padding: 24px;
+  color: #000;
+  background: var(--yellow);
+  border: 5px solid var(--red);
+  box-shadow: 10px 10px var(--green);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.legal-page section {
+  margin-top: 38px;
+  padding: 28px;
+  background: #111;
+  border: 3px solid var(--green);
+}
+
+.legal-page section:nth-of-type(3n + 2) { border-color: var(--pink); }
+.legal-page section:nth-of-type(3n) { border-color: var(--yellow); }
+
+.legal-page h2,
+.legal-page h3 {
+  margin: 0 0 14px;
+  color: var(--pink);
+  font-family: Impact, Charcoal, sans-serif;
+  letter-spacing: .5px;
+}
+
+.legal-page h2 { font-size: clamp(29px, 4.5vw, 45px); }
+.legal-page h3 { margin-top: 26px; color: var(--green); font-size: 24px; }
+.legal-page p { margin: 12px 0 0; font-size: 17px; line-height: 1.7; }
+.legal-page a { color: var(--green); font-weight: 800; }
+.legal-page code { padding: 2px 6px; color: var(--yellow); background: #000; }
+
+.legal-page .legal-warning {
+  color: #000;
+  background: var(--red);
+  border-color: var(--yellow);
+  box-shadow: 10px 10px var(--yellow);
+}
+
+.legal-page .legal-warning h2 { color: #fff; }
+
+footer.legal-footer {
+  min-height: 0;
+  padding: 42px 20px 52px;
+  border-top-width: 8px;
+}
+
+.legal-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+footer.legal-footer nav a {
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+.legal-footer p {
+  margin: 24px 0 0;
+  font: 700 15px/1.5 Arial, Helvetica, sans-serif;
+}
+
+.form-section form small a {
+  color: #000;
+  font-weight: 900;
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .legal-page { padding: 52px 15px 70px; }
+  .legal-page section, .legal-page aside { padding: 20px 17px; }
+  .legal-page p { font-size: 16px; }
+}

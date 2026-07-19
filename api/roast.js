@@ -131,6 +131,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: MODEL,
+        store: false,
         reasoning: { effort: 'low' },
         max_output_tokens: 7000,
         instructions: systemPrompt,
