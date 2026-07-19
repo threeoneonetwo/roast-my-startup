@@ -1,0 +1,70 @@
+.share-roast {
+  color: #000;
+  background: #39ff14;
+  border: 5px solid #000;
+  box-shadow: 14px 14px #ff0040;
+  margin: 48px 0 40px;
+  padding: 34px 24px 30px;
+  transform: rotate(-0.7deg);
+}
+
+.share-roast h3 {
+  margin: 0;
+  font: clamp(32px, 6vw, 58px)/0.95 Impact, Charcoal, sans-serif;
+}
+
+.share-roast p {
+  margin: 18px 0 26px;
+  font: 700 clamp(18px, 3vw, 26px)/1.25 Arial, Helvetica, sans-serif;
+}
+
+.share-roast__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.share-roast__buttons button {
+  color: #000;
+  background: #ff10f0;
+  border: 5px solid #000;
+  box-shadow: 7px 7px #000;
+  cursor: pointer;
+  padding: 16px 22px;
+  font: clamp(21px, 3.5vw, 32px)/1 Impact, Charcoal, sans-serif;
+}
+
+.share-roast__buttons button:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 4px 4px #000;
+}
+
+.share-roast__buttons .share-roast__x {
+  color: #39ff14;
+  background: #000;
+  border-color: #ffff00;
+}
+
+.share-roast__buttons .share-roast__copy {
+  background: #ffff00;
+}
+
+.share-roast > small {
+  min-height: 22px;
+  margin-top: 22px;
+  font-weight: 700;
+  display: block;
+}
+
+@media (max-width: 560px) {
+  .share-roast {
+    margin-inline: 4px;
+    padding: 28px 14px 24px;
+  }
+
+  .share-roast__buttons,
+  .share-roast__buttons button {
+    width: 100%;
+  }
+}
