@@ -12,7 +12,8 @@
 }
 
 .site-header__brand {
-  font-family: Impact, Charcoal, sans-serif;
+  font-family: Impact, "Arial Black", Arial, sans-serif !important;
+  font-weight: 900;
   color: #fff;
   font-size: clamp(28px, 5vw, 56px);
   line-height: 1;
