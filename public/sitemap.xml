@@ -3,4 +3,13 @@
   <url>
     <loc>https://roastmystartupnow.vercel.app/</loc>
   </url>
+  <url>
+    <loc>https://roastmystartupnow.vercel.app/roast</loc>
+  </url>
+  <url>
+    <loc>https://roastmystartupnow.vercel.app/graveyard</loc>
+  </url>
+  <url>
+    <loc>https://roastmystartupnow.vercel.app/reviews</loc>
+  </url>
 </urlset>
