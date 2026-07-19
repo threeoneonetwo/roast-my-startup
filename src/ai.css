@@ -59,6 +59,21 @@
   font-size: clamp(1.4rem, 4vw, 2.2rem);
 }
 
+.roast-sources {
+  margin-top: 2rem;
+  border: 5px solid #ff10f0;
+  background: #ffff00;
+  color: #000;
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+  box-shadow: 10px 10px #39ff14;
+}
+
+.roast-sources h3 { margin: 0 0 .75rem; color: #ff0040; font-size: 2rem; }
+.roast-sources ol { margin: 0; padding-left: 1.6rem; }
+.roast-sources li + li { margin-top: .55rem; }
+.roast-sources a { color: #000; font-weight: 900; overflow-wrap: anywhere; }
+
 @media (max-width: 560px) {
   .overlay.overlay--page,
   .missing-roast { min-height: calc(100vh - 58px); }

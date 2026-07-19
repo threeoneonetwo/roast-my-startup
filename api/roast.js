@@ -5,14 +5,16 @@ const SECTION_COLORS = ['#FFFF00', '#39FF14', '#FF10F0'];
 const outputSchema = {
   type: 'object',
   additionalProperties: false,
-  required: ['score', 'greeting', 'verdict', 'roastBlocks', 'localReality', 'finalLine'],
+  required: ['score', 'greeting', 'verdict', 'roastBlocks', 'localReality', 'finalLine', 'sources'],
   properties: {
     score: { type: 'integer', description: 'A brutally honest viability score from 0 to 100.' },
     greeting: { type: 'string', description: 'A short personalized opening line.' },
     verdict: { type: 'string', description: 'The core diagnosis in one sharp paragraph.' },
     roastBlocks: {
       type: 'array',
-      description: 'Four to six personalized sections. Choose the titles and subjects based on this specific startup rather than a fixed template.',
+      description: 'Exactly seven sections in this order: TAM Reality Check, Competition, Unit Economics, Go-to-Market Problem, Team/Founder Blind Spot, Customer Validation, The Kill Criterion.',
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: 'object',
         additionalProperties: false,
@@ -25,23 +27,51 @@ const outputSchema = {
     },
     localReality: { type: 'string', description: 'A useful, non-stereotyping observation about the stated location and market context.' },
     finalLine: { type: 'string', description: 'A memorable closing sentence with actionable truth.' },
+    sources: {
+      type: 'array',
+      description: 'Sources actually consulted during web research. Include only sources that support factual claims in the roast.',
+      maxItems: 8,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['title', 'url'],
+        properties: {
+          title: { type: 'string' },
+          url: { type: 'string' },
+        },
+      },
+    },
   },
 };
 
-const systemPrompt = `You are the editor of Roast My Startup, a brutal startup feedback product.
+const systemPrompt = `You are the editor of Roast My Startup: the voice of a burned-out strategy consultant who has reviewed thousands of mediocre business plans and has no patience left. You are sarcastic, tired, cutting, specific, and annoyingly right. Do not claim to be a real person, a former McKinsey partner, or to possess firsthand experience you do not have.
 
-Write a deeply personalized teardown of the startup and business plan. Be sarcastic, sharp, occasionally funny, and genuinely useful. Attack weak assumptions, strategy, product choices, market logic, distribution, defensibility, founder-market fit, and business economics—not the founder's identity.
+Your job is to expose the weaknesses in the submitted startup and business plan with surgical precision. Do not compliment the idea, offer a praise sandwich, or hunt for a positive angle. Attack the decisions, assumptions, economics, positioning, evidence, and strategy—not the founder's identity or protected traits.
 
-Important rules:
-- Do not use a fixed roast structure. Decide what deserves attention, in what order, and invent section titles that fit this specific submission.
-- Ground every criticism and joke in information the founder actually supplied. Never invent traction, competitors, credentials, or facts.
-- Use relevant founder background, experience, age range, and location to personalize the analysis, but do not stereotype or insult protected traits.
-- Identify the few most dangerous flaws instead of mechanically covering a startup checklist.
-- Explain why each flaw matters and, where useful, point toward a better decision.
-- Do not call it a pitch review. Review the overall startup and business plan.
-- Do not reveal or mention private contact details.
-- Avoid generic filler, praise sandwiches, false hope, slurs, threats, or cruelty unrelated to the business.
-- Keep the result punchy and readable. Return four to six roast blocks.`;
+RESEARCH AND TRUTH RULES
+- Use web search before making market-size, failure-rate, competitor, funding, pricing, or case-study claims.
+- Never invent statistics, reports, competitors, customer behavior, founder history, traction, or consulting experience.
+- Cite factual claims inline with bracketed source numbers such as [1], matching the sources array. Every number and named market claim must have a source.
+- Prefer primary sources, company filings/pages, credible research organizations, and established business publications. Do not name-drop Gartner, McKinsey, CB Insights, Crunchbase, Quibi, WeWork, Theranos, or any graveyard company unless it is genuinely relevant and supported.
+- If trustworthy public data is unavailable, say the submission supplied no evidence. Do not fill the gap with a plausible-sounding number.
+- Treat missing customer validation as missing evidence, not proof that no interviews occurred.
+- Never expose or mention private contact details.
+
+ROAST RULES
+- Find the core delusion: the inconsistency the founder is most likely refusing to confront.
+- Use sarcasm as the primary weapon, but make every joke specific to this submission.
+- Challenge inflated TAM, hidden competition, broken unit economics, absent distribution, weak founder-market fit, and vanity metrics wherever the evidence supports it.
+- Explain why an alleged unfair advantage is luck, access, or wishful thinking when that conclusion follows from the submission.
+- No redemption arc, motivational ending, or step-by-step mentorship. The Kill Criterion may name the missing condition required for survival, but do not turn it into a friendly action plan.
+- Phrases such as "Look, here's the thing…" and "Let's be honest…" are welcome when they sharpen the delivery.
+
+OUTPUT STRUCTURE
+1. verdict: The Core Delusion.
+2. Seven roastBlocks, in this exact order and with these headings: "📉 TAM Reality Check", "🥊 Competition", "💸 Unit Economics", "📣 Go-to-Market Problem", "🪞 Team/Founder Blind Spot", "☎️ Customer Validation", "☠️ The Kill Criterion".
+3. localReality: a location-specific market reality, using sourced facts when factual claims are made.
+4. finalLine: the uncomfortable truth they are avoiding.
+
+Keep paragraphs dense, memorable, and specific. Make it hurt because it is supported—not because it is fabricated.`;
 
 function clean(value, maxLength) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
@@ -73,7 +103,7 @@ export default async function handler(req, res) {
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
+  const timeout = setTimeout(() => controller.abort(), 55000);
 
   try {
     const openAIResponse = await fetch(OPENAI_URL, {
@@ -86,9 +116,12 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: MODEL,
         reasoning: { effort: 'low' },
-        max_output_tokens: 5000,
+        max_output_tokens: 7000,
         instructions: systemPrompt,
         input: `Roast this startup based only on the following founder submission:\n${JSON.stringify(submission, null, 2)}`,
+        tools: [{ type: 'web_search', search_context_size: 'low' }],
+        tool_choice: 'required',
+        include: ['web_search_call.action.sources'],
         text: {
           verbosity: 'medium',
           format: {
@@ -110,8 +143,17 @@ export default async function handler(req, res) {
     const text = payload.output?.flatMap((item) => item.content || []).find((content) => content.type === 'output_text')?.text;
     if (!text) throw new Error('OpenAI returned no structured roast.');
     const generated = JSON.parse(text);
-    const blocks = Array.isArray(generated.roastBlocks) ? generated.roastBlocks.slice(0, 6) : [];
+    const blocks = Array.isArray(generated.roastBlocks) ? generated.roastBlocks.slice(0, 7) : [];
     if (!blocks.length) throw new Error('OpenAI returned no roast blocks.');
+    const consultedUrls = new Set(payload.output?.flatMap((item) => item.type === 'web_search_call' ? (item.action?.sources || []).map((source) => source.url) : []) || []);
+    const sources = Array.isArray(generated.sources) ? generated.sources.flatMap((source) => {
+      try {
+        const url = new URL(source.url);
+        if (!['http:', 'https:'].includes(url.protocol)) return [];
+        if (consultedUrls.size && !consultedUrls.has(url.toString())) return [];
+        return [{ title: clean(source.title, 180) || url.hostname, url: url.toString() }];
+      } catch { return []; }
+    }).slice(0, 8) : [];
 
     const first = submission.firstName || 'founder';
     return res.status(200).json({
@@ -124,6 +166,7 @@ export default async function handler(req, res) {
         sections: blocks.map((block, index) => [block.title, SECTION_COLORS[index % SECTION_COLORS.length], block.body]),
         local: generated.localReality,
         final: generated.finalLine,
+        sources,
       },
       model: MODEL,
     });
