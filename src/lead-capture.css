@@ -1,0 +1,72 @@
+.form-section form > small {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.hero-form-section {
+  max-width: 900px;
+  margin: 24px auto 0;
+  padding: 0;
+  background: transparent;
+}
+
+.hero-form-section > h2 {
+  margin-bottom: 8px;
+}
+
+.hero-form-section > p {
+  margin: 0 0 28px;
+}
+
+.hero-form-section form {
+  text-align: left;
+}
+
+.hero-form-section input,
+.hero-form-section textarea,
+.hero-form-section select {
+  transition:
+    transform 150ms ease-out,
+    box-shadow 150ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-form-section input:hover,
+  .hero-form-section textarea:hover,
+  .hero-form-section select:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 7px 7px 0 #000;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-form-section input,
+  .hero-form-section textarea,
+  .hero-form-section select {
+    transition: none;
+  }
+}
+
+.signup-status {
+  max-width: 720px;
+  margin: 18px auto 0;
+  padding: 12px 16px;
+  color: #000 !important;
+  background: var(--yellow);
+  border: 3px solid var(--pink);
+  font:
+    800 16px/1.4 Arial,
+    Helvetica,
+    sans-serif !important;
+}
+
+@media (max-width: 700px) {
+  .hero-form-section {
+    margin-top: 18px;
+  }
+
+  .form-section form > small {
+    line-height: 1.4;
+    white-space: normal;
+  }
+}

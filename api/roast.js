@@ -1,13 +1,15 @@
-import { checkBotId } from 'botid/server';
-import * as Sentry from '@sentry/node';
+import { checkBotId } from "botid/server";
+import * as Sentry from "@sentry/node";
+import { randomUUID } from "node:crypto";
+import { saveLeaderboardEntry } from "./_leaderboard-store.js";
 
-const MODEL = 'gpt-5.6-sol';
-const OPENAI_URL = 'https://api.openai.com/v1/responses';
-const SECTION_COLORS = ['#FFFF00', '#39FF14', '#FF10F0'];
+const MODEL = "gpt-5.6-sol";
+const OPENAI_URL = "https://api.openai.com/v1/responses";
+const SECTION_COLORS = ["#FFFF00", "#39FF14", "#FF10F0"];
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "development",
   sendDefaultPii: false,
   tracesSampleRate: 0.05,
   beforeSend(event) {
@@ -22,43 +24,90 @@ Sentry.init({
 });
 
 const outputSchema = {
-  type: 'object',
+  type: "object",
   additionalProperties: false,
-  required: ['score', 'greeting', 'verdictTitle', 'verdict', 'roastBlocks', 'localRealityTitle', 'localReality', 'finalLine', 'sources'],
+  required: [
+    "score",
+    "greeting",
+    "verdictTitle",
+    "verdict",
+    "roastBlocks",
+    "localRealityTitle",
+    "localReality",
+    "finalLine",
+    "sources",
+  ],
   properties: {
-    score: { type: 'integer', description: 'A brutally honest viability score from 0 to 100.' },
-    greeting: { type: 'string', description: 'A short, funny, rude opening line personalized to the submission.' },
-    verdictTitle: { type: 'string', description: 'A funny, submission-specific heading for the opening diagnosis, including one fitting emoji.' },
-    verdict: { type: 'string', description: 'A sharp opening roast that identifies the most mockable delusion while still revealing a useful truth.' },
+    score: {
+      type: "integer",
+      description: "A brutally honest viability score from 0 to 100.",
+    },
+    greeting: {
+      type: "string",
+      description:
+        "A short, funny, rude opening line personalized to the submission.",
+    },
+    verdictTitle: {
+      type: "string",
+      description:
+        "A funny, submission-specific heading for the opening diagnosis, including one fitting emoji.",
+    },
+    verdict: {
+      type: "string",
+      description:
+        "A sharp opening roast that identifies the most mockable delusion while still revealing a useful truth.",
+    },
     roastBlocks: {
-      type: 'array',
-      description: 'Between four and eight personalized roast sections. Choose the number, subjects, order, titles, comedic framing, and pacing that best fit this submission; do not follow a fixed template.',
+      type: "array",
+      description:
+        "Between four and eight personalized roast sections. Choose the number, subjects, order, titles, comedic framing, and pacing that best fit this submission; do not follow a fixed template.",
       minItems: 4,
       maxItems: 8,
       items: {
-        type: 'object',
+        type: "object",
         additionalProperties: false,
-        required: ['title', 'body'],
+        required: ["title", "body"],
         properties: {
-          title: { type: 'string', description: 'A funny, original, submission-specific heading, including one fitting emoji.' },
-          body: { type: 'string', description: 'A proper personalized roast with jokes, comparisons, callbacks, and at least one specific useful insight grounded in the submission or researched evidence.' },
+          title: {
+            type: "string",
+            description:
+              "A funny, original, submission-specific heading, including one fitting emoji.",
+          },
+          body: {
+            type: "string",
+            description:
+              "A proper personalized roast with jokes, comparisons, callbacks, and at least one specific useful insight grounded in the submission or researched evidence.",
+          },
         },
       },
     },
-    localRealityTitle: { type: 'string', description: 'A funny heading for a non-stereotyping roast of the stated location or market context, including one fitting emoji.' },
-    localReality: { type: 'string', description: 'A funny, useful, non-stereotyping roast connected to the stated location and market context.' },
-    finalLine: { type: 'string', description: 'A brutal, funny, concise closing punchline that lands on the most uncomfortable truth.' },
+    localRealityTitle: {
+      type: "string",
+      description:
+        "A funny heading for a non-stereotyping roast of the stated location or market context, including one fitting emoji.",
+    },
+    localReality: {
+      type: "string",
+      description:
+        "A funny, useful, non-stereotyping roast connected to the stated location and market context.",
+    },
+    finalLine: {
+      type: "string",
+      description:
+        "A brutal, funny, concise closing punchline that lands on the most uncomfortable truth.",
+    },
     sources: {
-      type: 'array',
-      description: 'Sources actually consulted during web research. Include only sources that support factual claims in the roast.',
+      type: "array",
+      description:
+        "Sources actually consulted during web research. Include only sources that support factual claims in the roast.",
       maxItems: 8,
       items: {
-        type: 'object',
+        type: "object",
         additionalProperties: false,
-        required: ['title', 'url'],
+        required: ["title", "url"],
         properties: {
-          title: { type: 'string' },
-          url: { type: 'string' },
+          title: { type: "string" },
+          url: { type: "string" },
         },
       },
     },
@@ -110,60 +159,76 @@ OUTPUT STRUCTURE
 The finished result must be approximately 80% savage entertainment and 20% useful truth. Comedy, pacing, personality, and punchlines should dominate; the useful diagnosis should be concise and smuggled inside the roast rather than delivered as a report. Make it feel spontaneous and tailored, never modular or templated. Make it hurt because it is funny and recognizably true—not because it is fabricated.`;
 
 function clean(value, maxLength) {
-  return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
 
 function withoutDashes(value) {
-  if (typeof value !== 'string') return value;
+  if (typeof value !== "string") return value;
   return value
-    .replace(/[—–]/g, '. ')
-    .replace(/\s+-\s+/g, '. ')
-    .replace(/([A-Za-z])[-‐]([A-Za-z])/g, '$1 $2')
-    .replace(/(\d)\s*-\s*(\d)/g, '$1 to $2')
-    .replace(/\s{2,}/g, ' ')
+    .replace(/[—–]/g, ". ")
+    .replace(/\s+-\s+/g, ". ")
+    .replace(/([A-Za-z])[-‐]([A-Za-z])/g, "$1 $2")
+    .replace(/(\d)\s*-\s*(\d)/g, "$1 to $2")
+    .replace(/\s{2,}/g, " ")
     .trim();
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed.' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method not allowed." });
   }
 
   let verification;
   try {
     verification = await checkBotId({
       advancedOptions: {
-        checkLevel: 'basic',
+        checkLevel: "basic",
         headers: req.headers,
       },
     });
   } catch (error) {
-    Sentry.captureException(error, { tags: { area: 'botid_verification' } });
+    Sentry.captureException(error, { tags: { area: "botid_verification" } });
     await Sentry.flush(2000);
-    return res.status(503).json({ error: 'Bot protection is unavailable. Try again in a moment.' });
+    return res
+      .status(503)
+      .json({ error: "Bot protection is unavailable. Try again in a moment." });
   }
   if (verification.isBot) {
-    return res.status(403).json({ error: 'Automated roast requests are not allowed.' });
+    return res
+      .status(403)
+      .json({ error: "Automated roast requests are not allowed." });
   }
 
   if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ error: 'The roast engine is not configured yet.' });
+    return res
+      .status(503)
+      .json({ error: "The roast engine is not configured yet." });
   }
 
   const submission = {
     idea: clean(req.body?.idea, 6000),
     founderBackground: clean(req.body?.founderBackground, 4000),
-    firstName: clean(req.body?.first, 80),
+    fullName: clean(req.body?.fullName, 120),
     lastName: clean(req.body?.last, 80),
     ageRange: clean(req.body?.age, 30),
     experience: clean(req.body?.experience, 80),
     location: clean(req.body?.loc, 160),
     linkedInProvided: Boolean(clean(req.body?.linkedin, 500)),
+    leaderboardOptIn: req.body?.leaderboardOptIn === true,
+    startupName: clean(req.body?.startupName, 80),
   };
 
-  if (!submission.idea || !submission.founderBackground || !submission.firstName || !submission.location) {
-    return res.status(400).json({ error: 'The required founder and startup details are missing.' });
+  if (
+    !submission.idea ||
+    !submission.founderBackground ||
+    !submission.fullName ||
+    !submission.location ||
+    (submission.leaderboardOptIn && !submission.startupName)
+  ) {
+    return res
+      .status(400)
+      .json({ error: "The required founder and startup details are missing." });
   }
 
   const controller = new AbortController();
@@ -171,27 +236,27 @@ export default async function handler(req, res) {
 
   try {
     const openAIResponse = await fetch(OPENAI_URL, {
-      method: 'POST',
+      method: "POST",
       signal: controller.signal,
       headers: {
-        'content-type': 'application/json',
+        "content-type": "application/json",
         authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: MODEL,
         store: false,
-        reasoning: { effort: 'low' },
+        reasoning: { effort: "low" },
         max_output_tokens: 7000,
         instructions: systemPrompt,
         input: `Roast this startup based only on the following founder submission:\n${JSON.stringify(submission, null, 2)}`,
-        tools: [{ type: 'web_search', search_context_size: 'low' }],
-        tool_choice: 'required',
-        include: ['web_search_call.action.sources'],
+        tools: [{ type: "web_search", search_context_size: "low" }],
+        tool_choice: "required",
+        include: ["web_search_call.action.sources"],
         text: {
-          verbosity: 'medium',
+          verbosity: "medium",
           format: {
-            type: 'json_schema',
-            name: 'startup_roast',
+            type: "json_schema",
+            name: "startup_roast",
             strict: true,
             schema: outputSchema,
           },
@@ -201,53 +266,115 @@ export default async function handler(req, res) {
 
     const payload = await openAIResponse.json();
     if (!openAIResponse.ok) {
-      console.error('OpenAI request failed', openAIResponse.status, payload?.error?.type, payload?.error?.message);
-      Sentry.captureException(new Error('OpenAI roast request failed.'), {
-        tags: { area: 'openai_request', status: String(openAIResponse.status) },
-        extra: { errorType: payload?.error?.type || 'unknown' },
+      console.error(
+        "OpenAI request failed",
+        openAIResponse.status,
+        payload?.error?.type,
+        payload?.error?.message,
+      );
+      Sentry.captureException(new Error("OpenAI roast request failed."), {
+        tags: { area: "openai_request", status: String(openAIResponse.status) },
+        extra: { errorType: payload?.error?.type || "unknown" },
       });
       await Sentry.flush(2000);
-      return res.status(502).json({ error: 'The roast engine refused to clock in. Try again in a moment.' });
+      return res.status(502).json({
+        error: "The roast engine refused to clock in. Try again in a moment.",
+      });
     }
 
-    const text = payload.output?.flatMap((item) => item.content || []).find((content) => content.type === 'output_text')?.text;
-    if (!text) throw new Error('OpenAI returned no structured roast.');
+    const text = payload.output
+      ?.flatMap((item) => item.content || [])
+      .find((content) => content.type === "output_text")?.text;
+    if (!text) throw new Error("OpenAI returned no structured roast.");
     const generated = JSON.parse(text);
-    const blocks = Array.isArray(generated.roastBlocks) ? generated.roastBlocks.slice(0, 8) : [];
-    if (!blocks.length) throw new Error('OpenAI returned no roast blocks.');
-    const consultedUrls = new Set(payload.output?.flatMap((item) => item.type === 'web_search_call' ? (item.action?.sources || []).map((source) => source.url) : []) || []);
-    const sources = Array.isArray(generated.sources) ? generated.sources.flatMap((source) => {
-      try {
-        const url = new URL(source.url);
-        if (!['http:', 'https:'].includes(url.protocol)) return [];
-        if (consultedUrls.size && !consultedUrls.has(url.toString())) return [];
-        return [{ title: clean(source.title, 180) || url.hostname, url: url.toString() }];
-      } catch { return []; }
-    }).slice(0, 8) : [];
+    const blocks = Array.isArray(generated.roastBlocks)
+      ? generated.roastBlocks.slice(0, 8)
+      : [];
+    if (!blocks.length) throw new Error("OpenAI returned no roast blocks.");
+    const consultedUrls = new Set(
+      payload.output?.flatMap((item) =>
+        item.type === "web_search_call"
+          ? (item.action?.sources || []).map((source) => source.url)
+          : [],
+      ) || [],
+    );
+    const sources = Array.isArray(generated.sources)
+      ? generated.sources
+          .flatMap((source) => {
+            try {
+              const url = new URL(source.url);
+              if (!["http:", "https:"].includes(url.protocol)) return [];
+              if (consultedUrls.size && !consultedUrls.has(url.toString()))
+                return [];
+              return [
+                {
+                  title: clean(source.title, 180) || url.hostname,
+                  url: url.toString(),
+                },
+              ];
+            } catch {
+              return [];
+            }
+          })
+          .slice(0, 8)
+      : [];
 
-    const first = submission.firstName || 'founder';
+    const first = submission.fullName || "founder";
+    const roast = {
+      first,
+      loc: submission.location || "your undisclosed bunker",
+      score: Math.max(
+        0,
+        Math.min(100, Math.round(Number(generated.score) || 0)),
+      ),
+      greet: withoutDashes(generated.greeting),
+      verdictTitle: withoutDashes(generated.verdictTitle),
+      verdict: withoutDashes(generated.verdict),
+      sections: blocks.map((block, index) => [
+        withoutDashes(block.title),
+        SECTION_COLORS[index % SECTION_COLORS.length],
+        withoutDashes(block.body),
+      ]),
+      localTitle: withoutDashes(generated.localRealityTitle),
+      local: withoutDashes(generated.localReality),
+      final: withoutDashes(generated.finalLine),
+      sources,
+    };
+
+    if (submission.leaderboardOptIn && submission.startupName) {
+      try {
+        await saveLeaderboardEntry({
+          id: randomUUID(),
+          startupName: submission.startupName,
+          score: roast.score,
+          pitch: clean(submission.idea, 180),
+          roastLine: clean(roast.final || roast.verdict, 240),
+          submittedAt: Date.now(),
+        });
+      } catch (error) {
+        Sentry.captureException(error, { tags: { area: "leaderboard_store" } });
+      }
+    }
+
     return res.status(200).json({
-      roast: {
-        first,
-        loc: submission.location || 'your undisclosed bunker',
-        score: Math.max(0, Math.min(100, Math.round(Number(generated.score) || 0))),
-        greet: withoutDashes(generated.greeting),
-        verdictTitle: withoutDashes(generated.verdictTitle),
-        verdict: withoutDashes(generated.verdict),
-        sections: blocks.map((block, index) => [withoutDashes(block.title), SECTION_COLORS[index % SECTION_COLORS.length], withoutDashes(block.body)]),
-        localTitle: withoutDashes(generated.localRealityTitle),
-        local: withoutDashes(generated.localReality),
-        final: withoutDashes(generated.finalLine),
-        sources,
-      },
+      roast,
       model: MODEL,
     });
   } catch (error) {
-    const timedOut = error?.name === 'AbortError';
-    console.error('Roast generation failed', timedOut ? 'timeout' : error?.name);
-    Sentry.captureException(error, { tags: { area: 'roast_generation', timedOut: String(timedOut) } });
+    const timedOut = error?.name === "AbortError";
+    console.error(
+      "Roast generation failed",
+      timedOut ? "timeout" : error?.name,
+    );
+    Sentry.captureException(error, {
+      tags: { area: "roast_generation", timedOut: String(timedOut) },
+    });
     await Sentry.flush(2000);
-    return res.status(timedOut ? 504 : 500).json({ error: timedOut ? 'The roast took too long. Try again.' : 'The roast caught fire. Try again.' });
+    return res.status(timedOut ? 504 : 500).json({
+      error: timedOut
+        ? "The roast took too long. Try again."
+        : "The roast caught fire. Try again.",
+    });
   } finally {
     clearTimeout(timeout);
   }
