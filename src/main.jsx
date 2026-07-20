@@ -55,8 +55,8 @@ function App() {
     trackProductEvent('roast_submitted', { idea_length: ideaLength < 20 ? 'short' : ideaLength < 80 ? 'medium' : 'long', founder_background_length: backgroundLength < 20 ? 'short' : backgroundLength < 80 ? 'medium' : 'long' });
     try {
       const response = await fetch('/api/roast', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ idea: form.idea, founderBackground: form.founderBackground, first: form.first, age: form.age, experience: form.experience, loc: form.loc }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'The roast failed to generate.');
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(response.status === 429 ? 'You have roasted enough startups for now. Try again in ten minutes.' : data.error || 'The roast failed to generate.');
       trackProductEvent('roast_generated', { model: data.model });
       trackProductEvent('roast_viewed');
       setResult(data.roast);
