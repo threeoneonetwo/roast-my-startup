@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
+import { initBotId } from 'botid/client/core';
 import { toJpeg } from 'html-to-image';
 import { trackProductEvent } from './product-analytics';
 import LegalPage from './legal';
@@ -10,6 +11,14 @@ import './comic-fix.css';
 import './header.css';
 import './share.css';
 import './ai.css';
+
+initBotId({
+  protect: [{
+    path: '/api/roast',
+    method: 'POST',
+    advancedOptions: { checkLevel: 'basic' },
+  }],
+});
 
 const roasts = [
   ["a 'Web3' visionary", "It's Uber but for goldfish, on the blockchain", 'You built a database and called it a revolution. The goldfish deserve better.', 'nobody asked 🐟', '#39FF14', '🤡'],

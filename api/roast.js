@@ -1,3 +1,5 @@
+import { checkBotId } from 'botid/server';
+
 const MODEL = 'gpt-5.6-sol';
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const SECTION_COLORS = ['#FFFF00', '#39FF14', '#FF10F0'];
@@ -109,6 +111,16 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed.' });
+  }
+
+  const verification = await checkBotId({
+    advancedOptions: {
+      checkLevel: 'basic',
+      headers: req.headers,
+    },
+  });
+  if (verification.isBot) {
+    return res.status(403).json({ error: 'Automated roast requests are not allowed.' });
   }
 
   if (!process.env.OPENAI_API_KEY) {
