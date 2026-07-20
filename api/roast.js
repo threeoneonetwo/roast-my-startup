@@ -1,8 +1,25 @@
 import { checkBotId } from 'botid/server';
+import * as Sentry from '@sentry/node';
 
 const MODEL = 'gpt-5.6-sol';
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const SECTION_COLORS = ['#FFFF00', '#39FF14', '#FF10F0'];
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+  sendDefaultPii: false,
+  tracesSampleRate: 0.05,
+  beforeSend(event) {
+    if (event.request) {
+      delete event.request.data;
+      delete event.request.cookies;
+      delete event.request.headers;
+    }
+    delete event.user;
+    return event;
+  },
+});
 
 const outputSchema = {
   type: 'object',
@@ -113,12 +130,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
-  const verification = await checkBotId({
-    advancedOptions: {
-      checkLevel: 'basic',
-      headers: req.headers,
-    },
-  });
+  let verification;
+  try {
+    verification = await checkBotId({
+      advancedOptions: {
+        checkLevel: 'basic',
+        headers: req.headers,
+      },
+    });
+  } catch (error) {
+    Sentry.captureException(error, { tags: { area: 'botid_verification' } });
+    await Sentry.flush(2000);
+    return res.status(503).json({ error: 'Bot protection is unavailable. Try again in a moment.' });
+  }
   if (verification.isBot) {
     return res.status(403).json({ error: 'Automated roast requests are not allowed.' });
   }
@@ -178,6 +202,11 @@ export default async function handler(req, res) {
     const payload = await openAIResponse.json();
     if (!openAIResponse.ok) {
       console.error('OpenAI request failed', openAIResponse.status, payload?.error?.type, payload?.error?.message);
+      Sentry.captureException(new Error('OpenAI roast request failed.'), {
+        tags: { area: 'openai_request', status: String(openAIResponse.status) },
+        extra: { errorType: payload?.error?.type || 'unknown' },
+      });
+      await Sentry.flush(2000);
       return res.status(502).json({ error: 'The roast engine refused to clock in. Try again in a moment.' });
     }
 
@@ -216,6 +245,8 @@ export default async function handler(req, res) {
   } catch (error) {
     const timedOut = error?.name === 'AbortError';
     console.error('Roast generation failed', timedOut ? 'timeout' : error?.name);
+    Sentry.captureException(error, { tags: { area: 'roast_generation', timedOut: String(timedOut) } });
+    await Sentry.flush(2000);
     return res.status(timedOut ? 504 : 500).json({ error: timedOut ? 'The roast took too long. Try again.' : 'The roast caught fire. Try again.' });
   } finally {
     clearTimeout(timeout);

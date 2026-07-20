@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { initBotId } from 'botid/client/core';
 import { toJpeg } from 'html-to-image';
 import { trackProductEvent } from './product-analytics';
+import Sentry from './sentry';
 import LegalPage from './legal';
 import './styles.css';
 import './footer.css';
@@ -70,6 +71,7 @@ function App() {
       submitted.current = false;
       setRoastError(error.message || 'The roast caught fire. Try again.');
       trackProductEvent('roast_generation_failed');
+      Sentry.captureException(error, { tags: { area: 'roast_frontend' } });
     } finally {
       setIsRoasting(false);
     }
@@ -93,4 +95,4 @@ function App() {
 }
 function Field({label,green,...props}) { return <div className="field"><label>{label}</label><input className={green?'green':''} {...props}/></div> }
 function Select({label,options,...props}) { return <div className="field"><label>{label}</label><select required {...props}><option value="">Pick one</option>{options.map(x=><option key={x} value={x}>{x}</option>)}</select></div> }
-createRoot(document.getElementById('root')).render(<App/>);
+createRoot(document.getElementById('root')).render(<Sentry.ErrorBoundary fallback={<main className="missing-roast"><h1>THE SITE CAUGHT FIRE 🔥</h1><p>The error has been reported. Refresh the page and try again.</p></main>}><App/></Sentry.ErrorBoundary>);
