@@ -1,0 +1,14 @@
+.reviews h2 {
+  align-items: center;
+  display: flex;
+  font-size: clamp(20px, 6vw, 86px);
+  gap: 0.14em;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.reviews h2 .review-star {
+  -webkit-text-stroke: 0;
+  flex: 0 0 auto;
+  font-size: 0.8em;
+}
