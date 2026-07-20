@@ -4,6 +4,7 @@
   font-size: clamp(20px, 6vw, 86px);
   gap: 0.14em;
   justify-content: center;
+  margin-bottom: clamp(28px, 4vw, 52px);
   white-space: nowrap;
 }
 
@@ -11,4 +12,23 @@
   -webkit-text-stroke: 0;
   flex: 0 0 auto;
   font-size: 0.8em;
+}
+
+.reviews > p {
+  display: block;
+  line-height: 1.4;
+  max-width: 920px;
+  padding: 12px 20px;
+  width: fit-content;
+}
+
+@media (width <= 560px) {
+  .reviews h2 {
+    margin-bottom: 24px;
+  }
+
+  .reviews > p {
+    font-size: 17px;
+    max-width: calc(100vw - 36px);
+  }
 }
