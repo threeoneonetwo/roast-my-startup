@@ -199,7 +199,6 @@ function App() {
     experience: "",
     loc: "",
     email: "",
-    linkedin: "",
     leaderboardOptIn: false,
     startupName: "",
   });
@@ -314,14 +313,13 @@ function App() {
   }, []);
   const saveContact = async () => {
     if (!form.email) return;
-    setSignupStatus("📬 Saving your optional contact details…");
+    setSignupStatus("📬 Saving your contact details…");
     try {
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           email: form.email,
-          linkedin: form.linkedin,
           fullName: form.fullName,
         }),
       });
@@ -838,15 +836,6 @@ function App() {
               onChange={onChange}
               placeholder="founder@definitelythefuture.com"
               required
-            />
-            <Field
-              label="LinkedIn profile (optional)"
-              name="linkedin"
-              type="url"
-              autoComplete="url"
-              value={form.linkedin}
-              onChange={onChange}
-              placeholder="https://linkedin.com/in/your-profile"
             />
             <label className="leaderboard-optin">
               <input

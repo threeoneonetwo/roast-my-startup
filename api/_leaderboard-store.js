@@ -1,53 +1,76 @@
-const LEADERBOARD_KEY = "roast-my-startup:leaderboard:latest";
+import { neon } from "@neondatabase/serverless";
 
-function credentials() {
-  return {
-    url:
-      process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "",
-    token:
-      process.env.UPSTASH_REDIS_REST_TOKEN ||
-      process.env.KV_REST_API_TOKEN ||
-      "",
-  };
+let schemaPromise;
+
+function database() {
+  const connectionString =
+    process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+  if (!connectionString) return null;
+  return neon(connectionString);
 }
 
-async function command(args) {
-  const { url, token } = credentials();
-  if (!url || !token) return null;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${token}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(args),
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok || payload.error) {
-    throw new Error(payload.error || "Leaderboard storage request failed");
+async function ensureSchema(sql) {
+  if (!schemaPromise) {
+    schemaPromise = sql`
+      CREATE TABLE IF NOT EXISTS leaderboard_entries (
+        id TEXT PRIMARY KEY,
+        startup_name TEXT NOT NULL,
+        score INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+        pitch TEXT NOT NULL,
+        roast_line TEXT NOT NULL,
+        submitted_at BIGINT NOT NULL
+      )
+    `.catch((error) => {
+      schemaPromise = null;
+      throw error;
+    });
   }
-  return payload.result;
+  await schemaPromise;
 }
 
 export async function saveLeaderboardEntry(entry) {
-  if (!credentials().url || !credentials().token) return false;
-  const member = JSON.stringify(entry);
-  await command(["ZADD", LEADERBOARD_KEY, entry.submittedAt, member]);
-  await command(["ZREMRANGEBYRANK", LEADERBOARD_KEY, 0, -501]);
+  const sql = database();
+  if (!sql) return false;
+  await ensureSchema(sql);
+  await sql`
+    INSERT INTO leaderboard_entries (
+      id, startup_name, score, pitch, roast_line, submitted_at
+    ) VALUES (
+      ${entry.id}, ${entry.startupName}, ${entry.score}, ${entry.pitch},
+      ${entry.roastLine}, ${entry.submittedAt}
+    )
+    ON CONFLICT (id) DO NOTHING
+  `;
+  await sql`
+    DELETE FROM leaderboard_entries
+    WHERE id IN (
+      SELECT id FROM leaderboard_entries
+      ORDER BY submitted_at DESC
+      OFFSET 500
+    )
+  `;
   return true;
 }
 
 export async function getLeaderboardEntries() {
-  if (!credentials().url || !credentials().token) return [];
-  const members = await command(["ZREVRANGE", LEADERBOARD_KEY, 0, 49]);
-  return (Array.isArray(members) ? members : [])
-    .flatMap((member) => {
-      try {
-        return [JSON.parse(member)];
-      } catch {
-        return [];
-      }
-    })
-    .sort((a, b) => a.score - b.score || b.submittedAt - a.submittedAt)
-    .slice(0, 10);
+  const sql = database();
+  if (!sql) return [];
+  await ensureSchema(sql);
+  const rows = await sql`
+    SELECT
+      id,
+      startup_name AS "startupName",
+      score,
+      pitch,
+      roast_line AS "roastLine",
+      submitted_at AS "submittedAt"
+    FROM leaderboard_entries
+    ORDER BY score ASC, submitted_at DESC
+    LIMIT 10
+  `;
+  return rows.map((entry) => ({
+    ...entry,
+    score: Number(entry.score),
+    submittedAt: Number(entry.submittedAt),
+  }));
 }

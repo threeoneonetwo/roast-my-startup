@@ -10,6 +10,7 @@
     "deploy": "npm run build && wrangler pages deploy dist --project-name=roast-my-startup --branch=main"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@sentry/node": "^10.66.0",
     "@sentry/react": "^10.66.0",
     "@vercel/analytics": "^2.0.1",

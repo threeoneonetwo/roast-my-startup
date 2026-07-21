@@ -224,7 +224,6 @@ export default async function handler(req, res) {
     ageRange: clean(req.body?.age, 30),
     experience: clean(req.body?.experience, 80),
     location: clean(req.body?.loc, 160),
-    linkedInProvided: Boolean(clean(req.body?.linkedin, 500)),
     leaderboardOptIn: req.body?.leaderboardOptIn === true,
     startupName: clean(req.body?.startupName, 80),
   };

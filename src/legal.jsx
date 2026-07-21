@@ -33,14 +33,14 @@ function PrivacyPolicy() {
       <p className="legal-date">Effective: July 21, 2026</p>
       <aside>
         <strong>The short version:</strong> your startup submission is sent to
-        OpenAI to generate the roast. We do not maintain an account database or
-        intentionally save submissions on our own servers. Your required email
-        address and optional LinkedIn profile are stored separately in Loops and
-        are not sent to OpenAI. Submitting the form also signs the email address
-        up for product marketing messages. Every marketing email includes an
-        unsubscribe option. Analytics measure product usage without
-        intentionally receiving your submission or contact details. Do not
-        submit confidential information.
+        OpenAI to generate the roast. We do not intentionally save startup
+        submissions on our own servers. Your required full name and email
+        address are also stored in the project's private Neon Postgres database.
+        Your full name is included in the roast request sent to OpenAI, while
+        your email address is not. Submitting the form also signs the email
+        address up for product marketing messages. Analytics measure product
+        usage without intentionally receiving your submission or contact
+        details. Do not submit confidential information.
       </aside>
 
       <section>
@@ -60,20 +60,22 @@ function PrivacyPolicy() {
           combined with a distinctive business idea.
         </p>
         <p>
-          You may optionally provide a LinkedIn profile. The required email is
-          also enrolled in product marketing when you submit the form, as stated
-          in the warning beneath the submit button. We do not ask for a
-          password, payment information, or private LinkedIn credentials.
+          The required email is also enrolled in product marketing when you
+          submit the form, as stated in the warning beneath the submit button.
+          We do not ask for a password, payment information, or social account
+          credentials.
         </p>
       </section>
 
       <section>
         <h2>3. OpenAI processing</h2>
         <p>
-          The submitted fields are sent through a Vercel serverless function to
-          the OpenAI API. OpenAI generates the roast and may use web search to
-          find current market or competitor information. Search queries may
-          therefore be derived from details in your submission.
+          Your startup idea, founder background, full name, age range,
+          experience level, and location are sent through a Vercel serverless
+          function to the OpenAI API. Your email address is not included in that
+          request. OpenAI generates the roast and may use web search to find
+          current market or competitor information. Search queries may therefore
+          be derived from details in your submission.
         </p>
         <p>
           The API request is configured with <code>store: false</code>, so Roast
@@ -96,53 +98,53 @@ function PrivacyPolicy() {
       <section>
         <h2>4. What Roast My Startup stores</h2>
         <p>
-          Roast My Startup has no user accounts and no application database for
-          private startup submissions or generated roasts. The generated result
-          is saved in your browser's <code>sessionStorage</code> so the autopsy
-          page survives navigation in that tab. Starting another roast, clearing
-          site data, or ending the browser session removes that browser copy.
+          Roast My Startup has no user accounts and does not save private
+          startup submissions or generated roasts in its application database.
+          The generated result is saved in your browser's{" "}
+          <code>sessionStorage</code> so the autopsy page survives navigation in
+          that tab. Starting another roast, clearing site data, or ending the
+          browser session removes that browser copy.
         </p>
         <p>
           If you actively select the public leaderboard option, the startup
           name, a shortened version of the idea, its roast score, one generated
-          roast line, and the submission time are stored in Upstash Redis and
-          displayed publicly. Your full name, founder background, email,
-          LinkedIn profile, age, experience, and location are not included in
-          the leaderboard entry.
+          roast line, and the submission time are stored in Neon Postgres and
+          displayed publicly. Your full name, founder background, email, age,
+          experience, and location are not included in the leaderboard entry.
         </p>
         <p>
-          Loops stores your email address, full name, optional LinkedIn profile,
-          subscription status, source, and collection timestamp. These contact
-          details are kept separate from the startup submission and roast.
-          Contacts are marked as subscribed when the form is submitted.
-          Infrastructure providers may retain security, request, and operational
-          logs according to their own settings and legal obligations. We do not
-          deliberately write startup submissions or contact details to
-          application logs.
+          The project's private Neon Postgres database stores your email
+          address, full name, marketing consent status, and collection and
+          update timestamps. These contact details are kept separate from the
+          startup submission and roast. Infrastructure providers may retain
+          security, request, and operational logs according to their own
+          settings and legal obligations. We do not deliberately write startup
+          submissions or contact details to application logs.
         </p>
       </section>
 
       <section>
         <h2>5. Contact storage, analytics, monitoring, and abuse protection</h2>
-        <h3>Loops</h3>
+        <h3>Neon Postgres</h3>
         <p>
-          Loops stores contact details submitted through the form and enrolls
-          the email address in marketing campaigns and automated engagement
-          sequences. Every marketing email includes an unsubscribe option. See{" "}
+          Neon hosts the project's private Postgres database containing the
+          contact records described above. Database credentials are stored as
+          encrypted Vercel environment variables and are not exposed to the
+          browser. See{" "}
           <a
-            href="https://loops.so/legal/privacy"
+            href="https://neon.com/privacy-policy"
             target="_blank"
             rel="noreferrer"
           >
-            Loops' privacy policy
+            Neon's privacy policy
           </a>
           .
         </p>
-        <h3>Upstash Redis</h3>
+        <h3>Public leaderboard storage</h3>
         <p>
-          Upstash Redis stores public leaderboard entries submitted with
-          explicit permission. The leaderboard reads the newest entries and
-          ranks the most cooked results.
+          The same Neon Postgres database stores public leaderboard entries
+          submitted with explicit permission. The leaderboard reads the newest
+          entries and ranks the most cooked results.
         </p>
         <h3>PostHog</h3>
         <p>
@@ -152,9 +154,9 @@ function PrivacyPolicy() {
           coarse idea and background length buckets, model name, and sharing
           channel. Autocapture and session recording are disabled. We do not
           intentionally send startup text, founder names, email addresses,
-          LinkedIn profiles, locations, or other form contents to PostHog.
-          PostHog may use browser storage and receive ordinary technical
-          information required to process analytics. See{" "}
+          locations, or other form contents to PostHog. PostHog may use browser
+          storage and receive ordinary technical information required to process
+          analytics. See{" "}
           <a
             href="https://posthog.com/privacy"
             target="_blank"
@@ -249,13 +251,12 @@ function PrivacyPolicy() {
           although totals may become less accurate.
         </p>
         <p>
-          You can stop marketing emails using the unsubscribe link included in
-          every message. Unsubscribing may leave a suppressed contact record so
-          the preference can be honored. The site has no accounts or application
-          database containing startup submissions. Analytics are anonymous or
-          pseudonymous and may not be linkable to an individual visitor.
-          Provider security records may be retained where required for safety,
-          fraud prevention, or law.
+          You can request deletion of your contact record or withdrawal of
+          marketing consent using the contact method provided with a marketing
+          message. The site has no accounts or application database containing
+          startup submissions. Analytics are anonymous or pseudonymous and may
+          not be linkable to an individual visitor. Provider security records
+          may be retained where required for safety, fraud prevention, or law.
         </p>
       </section>
 
