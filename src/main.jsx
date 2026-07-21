@@ -177,31 +177,32 @@ function Marquee({ children, red = false }) {
     </div>
   );
 }
-function SiteHeader({ formProgress, remaining }) {
-  const showProgress = Number.isFinite(formProgress);
+function SiteHeader() {
   return (
     <header className="site-header">
       <a className="site-header__brand" href="/">
         ROAST<span>.</span>MY<span>.</span>STARTUP
       </a>
-      {showProgress && (
-        <div
-          className="site-header__progress"
-          role="progressbar"
-          aria-label="Form completion"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow={formProgress}
-        >
-          <span style={{ width: `${formProgress}%` }} />
-          <b>
-            {formProgress === 100
-              ? "100% READY FOR IMPACT"
-              : `${formProgress}% READY • ${remaining} LEFT`}
-          </b>
-        </div>
-      )}
     </header>
+  );
+}
+function CompletionBar({ progress, remaining }) {
+  return (
+    <div
+      className="field-progress"
+      role="progressbar"
+      aria-label="Form completion"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow={progress}
+    >
+      <span style={{ width: `${progress}%` }} />
+      <b>
+        {progress === 100
+          ? "100% READY FOR IMPACT"
+          : `${progress}% READY • ${remaining} LEFT`}
+      </b>
+    </div>
   );
 }
 function savedRoast() {
@@ -270,6 +271,10 @@ function App() {
   const formProgress = Math.round(
     (completedFields / requiredFields.length) * 100,
   );
+  const completionProps = {
+    progress: formProgress,
+    remaining: requiredFields.length - completedFields,
+  };
   const startForm = () => {
     if (!formStarted) {
       setFormStarted(true);
@@ -836,10 +841,7 @@ function App() {
   return (
     <main>
       <Analytics />
-      <SiteHeader
-        formProgress={formProgress}
-        remaining={requiredFields.length - completedFields}
-      />
+      <SiteHeader />
       <Marquee>
         🔥 YOUR STARTUP SUCKS 🔥 GET DESTROYED 🔥 NO REFUNDS 🔥 YOUR MOM LIED TO
         YOU 🔥 WE FIND WHAT EVERYONE'S TOO POLITE TO MENTION 🔥
@@ -891,6 +893,7 @@ function App() {
               onInput={autoGrowTextarea}
               placeholder="It's like Uber but for... (we're already cringing)"
             />
+            <CompletionBar {...completionProps} />
             <div className="field">
               <label>🧠 Founder background (your LinkedIn fan fiction) *</label>
               <textarea
@@ -902,6 +905,7 @@ function App() {
                 onInput={autoGrowTextarea}
                 placeholder="Former McKinsey? College dropout? Your dad knows a VC? Tell us what you've built, studied, survived, or dramatically resigned from."
               />
+              <CompletionBar {...completionProps} />
             </div>
             <Field
               label="Full name *"
@@ -911,6 +915,7 @@ function App() {
               placeholder="Chad Disruptor"
               green
               required
+              completionProps={completionProps}
             />
             <div className="grid">
               <Select
@@ -919,6 +924,7 @@ function App() {
                 value={form.age}
                 onChange={onChange}
                 options={["18 to 25", "26 to 35", "36 to 45", "45+"]}
+                completionProps={completionProps}
               />
               <Select
                 label="Experience *"
@@ -933,6 +939,7 @@ function App() {
                   "Student",
                   "Other",
                 ]}
+                completionProps={completionProps}
               />
             </div>
             <Field
@@ -942,6 +949,7 @@ function App() {
               onChange={onChange}
               placeholder="Silicon Valley (of course)"
               required
+              completionProps={completionProps}
             />
             <Field
               label="Email address *"
@@ -952,6 +960,7 @@ function App() {
               onChange={onChange}
               placeholder="founder@definitelythefuture.com"
               required
+              completionProps={completionProps}
             />
             <div
               className={`roast-submit-shell${isRoasting ? " is-loading" : ""}`}
@@ -1124,15 +1133,16 @@ function App() {
     </main>
   );
 }
-function Field({ label, green, ...props }) {
+function Field({ label, green, completionProps, ...props }) {
   return (
     <div className="field">
       <label>{label}</label>
       <input className={green ? "green" : ""} {...props} />
+      {completionProps && <CompletionBar {...completionProps} />}
     </div>
   );
 }
-function Select({ label, options, ...props }) {
+function Select({ label, options, completionProps, ...props }) {
   return (
     <div className="field">
       <label>{label}</label>
@@ -1144,6 +1154,7 @@ function Select({ label, options, ...props }) {
           </option>
         ))}
       </select>
+      {completionProps && <CompletionBar {...completionProps} />}
     </div>
   );
 }

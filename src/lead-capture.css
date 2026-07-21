@@ -36,6 +36,34 @@
   resize: none;
 }
 
+.field-progress {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 20px;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #fff;
+  background: #181818;
+  border: 2px solid #000;
+  font: 900 11px/1 Arial, Helvetica, sans-serif;
+}
+
+.field-progress > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--red), var(--pink), var(--green));
+  transition: width 220ms ease-out;
+}
+
+.field-progress > b {
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.04em;
+  text-shadow: 2px 2px #000;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .hero-form-section input:hover,
   .hero-form-section textarea:hover,
@@ -49,6 +77,10 @@
   .hero-form-section input,
   .hero-form-section textarea,
   .hero-form-section select {
+    transition: none;
+  }
+
+  .field-progress > span {
     transition: none;
   }
 
