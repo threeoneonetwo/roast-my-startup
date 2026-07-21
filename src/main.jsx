@@ -873,7 +873,9 @@ function App() {
         </p>
         <div id="roastform" className="form-section hero-form-section">
           <form onSubmit={submit}>
-            <label>💡 Pitch us your revolutionary idea in 50 words or less *</label>
+            <label className="idea-label">
+              💡 Pitch us your revolutionary idea in 50 words or less *
+            </label>
             <textarea
               name="idea"
               required

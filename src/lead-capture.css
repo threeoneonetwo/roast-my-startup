@@ -22,6 +22,10 @@
   text-align: left;
 }
 
+.hero-form-section .idea-label {
+  font-size: 15px;
+}
+
 .hero-form-section input,
 .hero-form-section textarea,
 .hero-form-section select {
@@ -76,6 +80,10 @@
   .form-section form > small {
     line-height: 1.4;
     white-space: normal;
+  }
+
+  .hero-form-section .idea-label {
+    font-size: 14px;
   }
 
 }
