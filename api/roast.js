@@ -7,6 +7,8 @@ const MODEL = "gpt-5.6-sol";
 const OPENAI_URL = "https://api.openai.com/v1/responses";
 const SECTION_COLORS = ["#FFFF00", "#39FF14", "#FF10F0"];
 
+export const maxDuration = 90;
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "development",
@@ -94,7 +96,7 @@ const outputSchema = {
     finalLine: {
       type: "string",
       description:
-        "A brutal, funny, concise closing punchline that lands on the most uncomfortable truth.",
+        "A two to four sentence personal conclusion addressed directly to the founder by name. Make it the meanest and funniest part of the roast, use callbacks to their background and claims, and land on the uncomfortable truth they are avoiding.",
     },
     sources: {
       type: "array",
@@ -127,6 +129,14 @@ PRIORITY ORDER
 
 Roast the founder's stated choices, confidence, professional self-positioning, experience, and logic when relevant. Never attack protected traits, appearance, private contact details, or vulnerabilities unrelated to the startup. Do not rely on generic founder stereotypes or random humiliation.
 
+PERSONAL INTENSITY
+- Address the founder directly by their supplied name in the opening and the final conclusion.
+- Treat their professional background as roast material. Find the funniest contradiction between what they claim to know and what their startup reveals they apparently do not know.
+- Roast their ego, judgment, positioning, decision making, performative confidence, LinkedIn style self mythology, and the excuses embedded in their submission.
+- Make jokes about the exact words, credentials, location claims, experience, and founder persona they voluntarily supplied. Build callbacks so the roast feels written for one person rather than generated for a category.
+- Prefer a precise personal punchline over sterile business vocabulary. If a paragraph could apply to ten other founders, rewrite it until it could embarrass only this one.
+- Be savage and direct without using slurs, attacking inherent identity, appearance, trauma, health, family, or unrelated private vulnerabilities.
+
 RESEARCH AND TRUTH RULES
 - Use web search before making market-size, failure-rate, competitor, funding, pricing, or case-study claims.
 - Never invent statistics, reports, competitors, customer behavior, founder history, traction, or consulting experience.
@@ -154,7 +164,7 @@ OUTPUT STRUCTURE
 1. verdictTitle and verdict: an original opening diagnosis based on the submission's most roastable delusion.
 2. Four to eight roastBlocks chosen and ordered specifically for this submission. Invent original titles; never force the same standard business sections when they do not fit.
 3. localRealityTitle and localReality: a funny location-specific market reality, using sourced facts for factual claims and avoiding stereotypes.
-4. finalLine: the funniest version of the uncomfortable truth they are avoiding.
+4. finalLine: a two to four sentence personal conclusion addressed to the founder by name. This is the knockout punch. Call back to their background, their most delusional claim, and the contradiction that best exposes their judgment. Do not give encouragement or a redemption arc.
 
 The finished result must be approximately 80% savage entertainment and 20% useful truth. Comedy, pacing, personality, and punchlines should dominate; the useful diagnosis should be concise and smuggled inside the roast rather than delivered as a report. Make it feel spontaneous and tailored, never modular or templated. Make it hurt because it is funny and recognizably true—not because it is fabricated.`;
 
@@ -232,7 +242,7 @@ export default async function handler(req, res) {
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), 85000);
 
   try {
     const openAIResponse = await fetch(OPENAI_URL, {
@@ -246,7 +256,7 @@ export default async function handler(req, res) {
         model: MODEL,
         store: false,
         reasoning: { effort: "low" },
-        max_output_tokens: 7000,
+        max_output_tokens: 6000,
         instructions: systemPrompt,
         input: `Roast this startup based only on the following founder submission:\n${JSON.stringify(submission, null, 2)}`,
         tools: [{ type: "web_search", search_context_size: "low" }],
@@ -366,9 +376,16 @@ export default async function handler(req, res) {
       "Roast generation failed",
       timedOut ? "timeout" : error?.name,
     );
-    Sentry.captureException(error, {
-      tags: { area: "roast_generation", timedOut: String(timedOut) },
-    });
+    if (timedOut) {
+      Sentry.captureMessage("Roast generation timed out", {
+        level: "warning",
+        tags: { area: "roast_generation", timedOut: "true" },
+      });
+    } else {
+      Sentry.captureException(error, {
+        tags: { area: "roast_generation", timedOut: "false" },
+      });
+    }
     await Sentry.flush(2000);
     return res.status(timedOut ? 504 : 500).json({
       error: timedOut

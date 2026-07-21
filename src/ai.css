@@ -1,17 +1,74 @@
 .form-section form button:disabled {
   cursor: wait;
-  filter: grayscale(.2);
-  opacity: .72;
+  filter: grayscale(0.2);
+  opacity: 0.72;
   transform: none;
+}
+
+.roast-submit {
+  position: relative;
+  overflow: hidden;
+}
+
+.roast-submit:has(.roast-progress) {
+  padding-bottom: 44px;
+}
+
+.roast-submit__label {
+  display: block;
+}
+
+.roast-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 27px;
+  overflow: hidden;
+  background: #000;
+  border-top: 4px solid #000;
+  font:
+    900 14px/23px Arial,
+    Helvetica,
+    sans-serif;
+}
+
+.roast-progress__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #39ff14;
+  transition: width 400ms ease-out;
+}
+
+.roast-progress b {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  text-shadow: 1px 1px #000;
+}
+
+.final h3 {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: clamp(24px, 4vw, 36px);
+}
+
+.final p {
+  margin: 0;
+  font:
+    700 clamp(19px, 3vw, 27px) / 1.3 Arial,
+    Helvetica,
+    sans-serif;
+  text-transform: none;
 }
 
 .roast-error {
   display: block;
-  margin: .75rem 0 0;
+  margin: 0.75rem 0 0;
   border: 4px solid #000;
   background: #ffff00;
   color: #c40035;
-  padding: .7rem;
+  padding: 0.7rem;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 900;
   text-align: center;
@@ -54,7 +111,7 @@
   border: 5px solid #ffff00;
   background: #ff0040;
   color: #fff;
-  padding: .8rem 1.4rem;
+  padding: 0.8rem 1.4rem;
   cursor: pointer;
   font-size: clamp(1.4rem, 4vw, 2.2rem);
 }
@@ -69,12 +126,27 @@
   box-shadow: 10px 10px #39ff14;
 }
 
-.roast-sources h3 { margin: 0 0 .75rem; color: #ff0040; font-size: 2rem; }
-.roast-sources ol { margin: 0; padding-left: 1.6rem; }
-.roast-sources li + li { margin-top: .55rem; }
-.roast-sources a { color: #000; font-weight: 900; overflow-wrap: anywhere; }
+.roast-sources h3 {
+  margin: 0 0 0.75rem;
+  color: #ff0040;
+  font-size: 2rem;
+}
+.roast-sources ol {
+  margin: 0;
+  padding-left: 1.6rem;
+}
+.roast-sources li + li {
+  margin-top: 0.55rem;
+}
+.roast-sources a {
+  color: #000;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
 
 @media (max-width: 560px) {
   .overlay.overlay--page,
-  .missing-roast { min-height: calc(100vh - 58px); }
+  .missing-roast {
+    min-height: calc(100vh - 58px);
+  }
 }

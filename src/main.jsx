@@ -206,6 +206,7 @@ function App() {
   const [signupStatus, setSignupStatus] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const [isRoasting, setIsRoasting] = useState(false);
+  const [roastProgress, setRoastProgress] = useState(0);
   const [roastError, setRoastError] = useState("");
   const [leaderboard, setLeaderboard] = useState(dailyDemoLeaderboard);
   const [leaderboardIsDemo, setLeaderboardIsDemo] = useState(true);
@@ -235,6 +236,18 @@ function App() {
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
+  useEffect(() => {
+    if (!isRoasting) return undefined;
+    const timer = window.setInterval(() => {
+      setRoastProgress((progress) => {
+        if (progress < 35) return Math.min(35, progress + 6);
+        if (progress < 65) return Math.min(65, progress + 3);
+        if (progress < 85) return Math.min(85, progress + 2);
+        return Math.min(96, progress + 1);
+      });
+    }, 850);
+    return () => window.clearInterval(timer);
+  }, [isRoasting]);
   useEffect(() => {
     const titles = {
       "/roast": "Your Full Autopsy | Roast My Startup",
@@ -297,6 +310,7 @@ function App() {
     e.preventDefault();
     submitted.current = true;
     setIsRoasting(true);
+    setRoastProgress(4);
     setRoastError("");
     const ideaLength = form.idea.trim().split(/\s+/).filter(Boolean).length;
     const backgroundLength = form.founderBackground
@@ -337,6 +351,8 @@ function App() {
         );
       trackProductEvent("roast_generated", { model: data.model });
       trackProductEvent("roast_viewed");
+      setRoastProgress(100);
+      await new Promise((resolve) => window.setTimeout(resolve, 250));
       setResult(data.roast);
       sessionStorage.setItem("roast-result", JSON.stringify(data.roast));
       window.history.pushState({}, "", "/roast");
@@ -357,9 +373,12 @@ function App() {
       setTimeout(() => setConfetti([]), 4300);
     } catch (error) {
       submitted.current = false;
+      setRoastProgress(0);
       setRoastError(error.message || "The roast caught fire. Try again.");
       trackProductEvent("roast_generation_failed");
-      Sentry.captureException(error, { tags: { area: "roast_frontend" } });
+      if (!error.message?.includes("took too long")) {
+        Sentry.captureException(error, { tags: { area: "roast_frontend" } });
+      }
     } finally {
       setIsRoasting(false);
     }
@@ -546,7 +565,10 @@ function App() {
                 </h3>
                 <p>{result.local}</p>
               </article>
-              <article className="final">{result.final}</article>
+              <article className="final">
+                <h3>☠️ YOUR PERSONAL CONCLUSION</h3>
+                <p>{result.final}</p>
+              </article>
               {result.sources?.length > 0 && (
                 <section className="roast-sources">
                   <h3>🧾 RECEIPTS</h3>
@@ -778,15 +800,34 @@ function App() {
               </p>
             )}
             <button
+              className="roast-submit"
               disabled={isRoasting}
               onMouseEnter={() => setHover(true)}
               onMouseLeave={() => setHover(false)}
             >
-              {isRoasting
-                ? "🔥 THE ROAST IS COOKING… 🔥"
-                : hover
-                  ? "😈 I'M READY TO GET DESTROYED 😈"
-                  : "🔥 ROAST ME 🔥"}
+              <span className="roast-submit__label">
+                {isRoasting
+                  ? "🔥 THE ROAST IS COOKING… 🔥"
+                  : hover
+                    ? "😈 I'M READY TO GET DESTROYED 😈"
+                    : "🔥 ROAST ME 🔥"}
+              </span>
+              {isRoasting && (
+                <span
+                  className="roast-progress"
+                  role="progressbar"
+                  aria-label="Estimated roast progress"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow={roastProgress}
+                >
+                  <span
+                    className="roast-progress__fill"
+                    style={{ width: `${roastProgress}%` }}
+                  />
+                  <b>{roastProgress}%</b>
+                </span>
+              )}
             </button>
             {roastError && (
               <strong className="roast-error" role="alert">
