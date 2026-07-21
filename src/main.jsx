@@ -876,19 +876,23 @@ function App() {
                 score, and one roast line but never your personal details
               </p>
             )}
-            <button
-              className="roast-submit"
-              disabled={isRoasting}
-              onMouseEnter={() => setHover(true)}
-              onMouseLeave={() => setHover(false)}
+            <div
+              className={`roast-submit-shell${isRoasting ? " is-loading" : ""}`}
             >
-              <span className="roast-submit__label">
-                {isRoasting
-                  ? "🔥 THE ROAST IS COOKING… 🔥"
-                  : hover
-                    ? "😈 I'M READY TO GET DESTROYED 😈"
-                    : "🔥 ROAST ME 🔥"}
-              </span>
+              <button
+                className="roast-submit"
+                disabled={isRoasting}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+              >
+                <span className="roast-submit__label">
+                  {isRoasting
+                    ? "🔥 THE ROAST IS COOKING… 🔥"
+                    : hover
+                      ? "😈 I'M READY TO GET DESTROYED 😈"
+                      : "🔥 ROAST ME 🔥"}
+                </span>
+              </button>
               {isRoasting && (
                 <span
                   className="roast-progress"
@@ -902,10 +906,10 @@ function App() {
                     className="roast-progress__fill"
                     style={{ width: `${roastProgress}%` }}
                   />
-                  <b>{roastProgress}%</b>
+                  <b>{roastProgress}% ROASTED</b>
                 </span>
               )}
-            </button>
+            </div>
             {roastError && (
               <strong className="roast-error" role="alert">
                 {roastError}
