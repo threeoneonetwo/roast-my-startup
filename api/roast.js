@@ -1,7 +1,6 @@
 import { checkBotId } from "botid/server";
 import * as Sentry from "@sentry/node";
-import { randomUUID } from "node:crypto";
-import { saveLeaderboardEntry } from "./_leaderboard-store.js";
+import { createLeaderboardToken } from "./_leaderboard-token.js";
 
 const MODEL = "gpt-5.6-sol";
 const OPENAI_URL = "https://api.openai.com/v1/responses";
@@ -224,16 +223,13 @@ export default async function handler(req, res) {
     ageRange: clean(req.body?.age, 30),
     experience: clean(req.body?.experience, 80),
     location: clean(req.body?.loc, 160),
-    leaderboardOptIn: req.body?.leaderboardOptIn === true,
-    startupName: clean(req.body?.startupName, 80),
   };
 
   if (
     !submission.idea ||
     !submission.founderBackground ||
     !submission.fullName ||
-    !submission.location ||
-    (submission.leaderboardOptIn && !submission.startupName)
+    !submission.location
   ) {
     return res
       .status(400)
@@ -350,24 +346,14 @@ export default async function handler(req, res) {
       sources,
     };
 
-    if (submission.leaderboardOptIn && submission.startupName) {
-      try {
-        await saveLeaderboardEntry({
-          id: randomUUID(),
-          startupName: submission.startupName,
-          score: roast.score,
-          pitch: clean(submission.idea, 180),
-          roastLine: clean(roast.final || roast.verdict, 240),
-          submittedAt: Date.now(),
-        });
-      } catch (error) {
-        Sentry.captureException(error, { tags: { area: "leaderboard_store" } });
-      }
-    }
-
     return res.status(200).json({
       roast,
       model: MODEL,
+      leaderboardToken: createLeaderboardToken({
+        score: roast.score,
+        pitch: clean(submission.idea, 180),
+        roastLine: clean(roast.final || roast.verdict, 240),
+      }),
     });
   } catch (error) {
     const timedOut = error?.name === "AbortError";

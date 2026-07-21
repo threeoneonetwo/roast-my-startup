@@ -106,7 +106,7 @@ function PrivacyPolicy() {
           browser session removes that browser copy.
         </p>
         <p>
-          If you actively select the public leaderboard option, the startup
+          If you actively join the public leaderboard after seeing a roast, the startup
           name, a shortened version of the idea, its roast score, one generated
           roast line, and the submission time are stored in Neon Postgres and
           displayed publicly. Your full name, founder background, email, age,
@@ -353,7 +353,7 @@ function Terms() {
       <section>
         <h2>7. Optional public leaderboard</h2>
         <p>
-          The public leaderboard is optional. If you select it, you authorize
+          The public leaderboard is optional. If you join it after seeing your roast, you authorize
           Roast My Startup to display the startup name, shortened idea, roast
           score, and selected roast text publicly until the entry is removed. Do
           not enter a confidential or third party startup. Scores are comedic

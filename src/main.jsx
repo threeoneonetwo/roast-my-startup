@@ -28,6 +28,11 @@ initBotId({
       method: "POST",
       advancedOptions: { checkLevel: "basic" },
     },
+    {
+      path: "/api/leaderboard",
+      method: "POST",
+      advancedOptions: { checkLevel: "basic" },
+    },
   ],
 });
 
@@ -199,7 +204,6 @@ function App() {
     experience: "",
     loc: "",
     email: "",
-    leaderboardOptIn: false,
     startupName: "",
   });
   const [result, setResult] = useState(savedRoast);
@@ -215,14 +219,39 @@ function App() {
   const [roastError, setRoastError] = useState("");
   const [leaderboard, setLeaderboard] = useState(dailyDemoLeaderboard);
   const [leaderboardIsDemo, setLeaderboardIsDemo] = useState(true);
+  const [leaderboardStatus, setLeaderboardStatus] = useState("");
+  const [isJoiningLeaderboard, setIsJoiningLeaderboard] = useState(false);
   const submitted = useRef(false);
   const shareCardRef = useRef(null);
   const shareImageRef = useRef(null);
   const onChange = (e) => {
     startForm();
     const { name, type, checked, value } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    setForm((current) => ({
+      ...current,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
+  const autoGrowTextarea = (event) => {
+    const textarea = event.currentTarget;
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  };
+  const requiredFields = [
+    "idea",
+    "founderBackground",
+    "fullName",
+    "age",
+    "experience",
+    "loc",
+    "email",
+  ];
+  const completedFields = requiredFields.filter((key) =>
+    String(form[key] || "").trim(),
+  ).length;
+  const formProgress = Math.round(
+    (completedFields / requiredFields.length) * 100,
+  );
   const startForm = () => {
     if (!formStarted) {
       setFormStarted(true);
@@ -366,8 +395,6 @@ function App() {
           age: form.age,
           experience: form.experience,
           loc: form.loc,
-          leaderboardOptIn: form.leaderboardOptIn,
-          startupName: form.startupName,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -381,8 +408,12 @@ function App() {
       trackProductEvent("roast_viewed");
       setRoastProgress(100);
       await new Promise((resolve) => window.setTimeout(resolve, 250));
-      setResult(data.roast);
-      sessionStorage.setItem("roast-result", JSON.stringify(data.roast));
+      const roastResult = {
+        ...data.roast,
+        leaderboardToken: data.leaderboardToken,
+      };
+      setResult(roastResult);
+      sessionStorage.setItem("roast-result", JSON.stringify(roastResult));
       window.history.pushState({}, "", "/roast");
       setRoute("/roast");
       void saveContact();
@@ -409,6 +440,30 @@ function App() {
       }
     } finally {
       setIsRoasting(false);
+    }
+  };
+  const joinLeaderboard = async (event) => {
+    event.preventDefault();
+    if (!form.startupName.trim() || !result?.leaderboardToken) return;
+    setIsJoiningLeaderboard(true);
+    setLeaderboardStatus("Submitting your public humiliation…");
+    try {
+      const response = await fetch("/api/leaderboard", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          startupName: form.startupName,
+          token: result.leaderboardToken,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Leaderboard signup failed");
+      setLeaderboardStatus("🔥 You're officially on the Most Cooked leaderboard");
+      trackProductEvent("leaderboard_joined");
+    } catch (error) {
+      setLeaderboardStatus(error.message || "The leaderboard caught fire");
+    } finally {
+      setIsJoiningLeaderboard(false);
     }
   };
   const copyText = async (text) => {
@@ -519,6 +574,7 @@ function App() {
     setShareStatus("");
     shareImageRef.current = null;
     setSignupStatus("");
+    setLeaderboardStatus("");
     setRoastError("");
     setResult(null);
     sessionStorage.removeItem("roast-result");
@@ -603,6 +659,43 @@ function App() {
                 <h3>☠️ YOUR PERSONAL CONCLUSION</h3>
                 <p>{result.final}</p>
               </article>
+              <section className="leaderboard-invite">
+                <h3>🔥 WANT TO BE ON THE LEADERBOARD?</h3>
+                <p>
+                  Put this startup on the public Most Cooked leaderboard so the
+                  internet can admire the wreckage
+                </p>
+                {leaderboardStatus.includes("officially") ? (
+                  <strong>{leaderboardStatus}</strong>
+                ) : (
+                  <form onSubmit={joinLeaderboard}>
+                    <label htmlFor="leaderboard-startup-name">
+                      Startup name
+                    </label>
+                    <input
+                      id="leaderboard-startup-name"
+                      name="startupName"
+                      value={form.startupName}
+                      onChange={onChange}
+                      placeholder="Delusion Labs"
+                      maxLength="80"
+                      required
+                    />
+                    <button type="submit" disabled={isJoiningLeaderboard}>
+                      {isJoiningLeaderboard
+                        ? "ADDING THE EVIDENCE…"
+                        : "YES, PUBLICLY HUMILIATE ME"}
+                    </button>
+                    {leaderboardStatus && (
+                      <small role="status">{leaderboardStatus}</small>
+                    )}
+                  </form>
+                )}
+                <small>
+                  Public: startup name, shortened idea, score, and one roast
+                  line. Your personal details stay private
+                </small>
+              </section>
               {result.sources?.length > 0 && (
                 <section className="roast-sources">
                   <h3>🧾 RECEIPTS</h3>
@@ -767,6 +860,21 @@ function App() {
         </p>
         <div id="roastform" className="form-section hero-form-section">
           <form onSubmit={submit}>
+            <div
+              className="form-completion"
+              role="progressbar"
+              aria-label="Form completion"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={formProgress}
+            >
+              <span style={{ width: `${formProgress}%` }} />
+              <b>
+                {formProgress === 100
+                  ? "100% READY FOR IMPACT"
+                  : `${formProgress}% READY • ${requiredFields.length - completedFields} LEFT`}
+              </b>
+            </div>
             <label>💡 Your "revolutionary" idea *</label>
             <textarea
               name="idea"
@@ -774,6 +882,7 @@ function App() {
               rows="4"
               value={form.idea}
               onChange={onChange}
+              onInput={autoGrowTextarea}
               placeholder="It's like Uber but for... (we're already cringing)"
             />
             <div className="field">
@@ -784,6 +893,7 @@ function App() {
                 rows="4"
                 value={form.founderBackground}
                 onChange={onChange}
+                onInput={autoGrowTextarea}
                 placeholder="Former McKinsey? College dropout? Your dad knows a VC? Tell us what you've built, studied, survived, or dramatically resigned from."
               />
             </div>
@@ -837,34 +947,6 @@ function App() {
               placeholder="founder@definitelythefuture.com"
               required
             />
-            <label className="leaderboard-optin">
-              <input
-                type="checkbox"
-                name="leaderboardOptIn"
-                checked={form.leaderboardOptIn}
-                onChange={onChange}
-              />
-              <span>
-                Put this startup on the public Most Cooked leaderboard
-              </span>
-            </label>
-            {form.leaderboardOptIn && (
-              <Field
-                label="Startup name for the leaderboard *"
-                name="startupName"
-                value={form.startupName}
-                onChange={onChange}
-                placeholder="Delusion Labs"
-                maxLength="80"
-                required
-              />
-            )}
-            {form.leaderboardOptIn && (
-              <p className="leaderboard-disclosure">
-                This publicly displays the startup name, a shortened idea, roast
-                score, and one roast line but never your personal details
-              </p>
-            )}
             <div
               className={`roast-submit-shell${isRoasting ? " is-loading" : ""}`}
             >
