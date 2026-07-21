@@ -37,9 +37,8 @@
 }
 
 .form-completion {
-  position: sticky;
-  top: 77px;
-  z-index: 20;
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   height: 40px;
@@ -111,7 +110,6 @@
   }
 
   .form-completion {
-    top: 63px;
     height: 36px;
     margin-inline: -5px;
     font-size: 13px;
