@@ -8,14 +8,180 @@
   transform: rotate(-0.7deg);
 }
 
+.share-card-capture {
+  position: fixed;
+  top: 0;
+  left: -20000px;
+  z-index: -1;
+  width: 1200px;
+  padding: 54px;
+  color: #fff;
+  background: linear-gradient(140deg, #ff0040, #ff10f0 45%, #000);
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+  pointer-events: none;
+}
+
+.share-card-capture header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding-bottom: 25px;
+  border-bottom: 9px solid #39ff14;
+}
+
+.share-card-capture header span {
+  font:
+    68px/0.9 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+}
+
+.share-card-capture header b {
+  color: #39ff14;
+}
+
+.share-card-capture header b:first-of-type {
+  color: #ff0040;
+}
+
+.share-card-capture header small {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.share-card-capture__score {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 8px;
+  align-items: end;
+  margin: 34px 0;
+  padding: 25px 30px;
+  color: #000;
+  background: #ffff00;
+  border: 7px solid #000;
+  box-shadow: 12px 12px #39ff14;
+}
+
+.share-card-capture__score strong {
+  font:
+    118px/0.75 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+}
+
+.share-card-capture__score span {
+  font:
+    42px/1 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+}
+
+.share-card-capture__score em {
+  align-self: center;
+  justify-self: end;
+  font:
+    42px/1 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+}
+
+.share-card-capture__verdict,
+.share-card-capture__final {
+  padding: 26px 30px;
+  color: #000;
+  background: #fff;
+  border: 7px solid #000;
+}
+
+.share-card-capture h2,
+.share-card-capture h3,
+.share-card-capture p {
+  margin: 0;
+}
+
+.share-card-capture h2 {
+  font:
+    42px/1 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+}
+
+.share-card-capture__verdict p,
+.share-card-capture__final p {
+  margin-top: 13px;
+  font-size: 25px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.share-card-capture__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.share-card-capture__grid article {
+  min-height: 180px;
+  padding: 20px 22px;
+  color: #000;
+  border: 6px solid #000;
+}
+
+.share-card-capture__grid h3 {
+  font:
+    30px/1 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+}
+
+.share-card-capture__grid p {
+  margin-top: 10px;
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.share-card-capture__final {
+  color: #ffff00;
+  background: #000;
+  border-color: #39ff14;
+}
+
+.share-card-capture footer {
+  padding: 28px 0 0;
+  color: #ffff00;
+  background: transparent;
+  border: 0;
+  font:
+    34px/1 Impact,
+    "Arial Black",
+    Arial,
+    sans-serif;
+  text-align: center;
+}
+
 .share-roast h3 {
   margin: 0;
-  font: clamp(32px, 6vw, 58px)/0.95 Impact, Charcoal, sans-serif;
+  font:
+    clamp(32px, 6vw, 58px) / 0.95 Impact,
+    Charcoal,
+    sans-serif;
 }
 
 .share-roast p {
   margin: 18px 0 26px;
-  font: 700 clamp(18px, 3vw, 26px)/1.25 Arial, Helvetica, sans-serif;
+  font:
+    700 clamp(18px, 3vw, 26px) / 1.25 Arial,
+    Helvetica,
+    sans-serif;
 }
 
 .share-roast__buttons {
@@ -32,7 +198,10 @@
   box-shadow: 7px 7px #000;
   cursor: pointer;
   padding: 16px 22px;
-  font: clamp(21px, 3.5vw, 32px)/1 Impact, Charcoal, sans-serif;
+  font:
+    clamp(21px, 3.5vw, 32px) / 1 Impact,
+    Charcoal,
+    sans-serif;
 }
 
 .share-roast__buttons button:hover {

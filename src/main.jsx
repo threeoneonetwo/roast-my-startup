@@ -157,6 +157,12 @@ function dailyDemoLeaderboard() {
     }));
 }
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const condense = (value, limit = 155) => {
+  const text = String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > limit ? `${text.slice(0, limit - 1).trim()}…` : text;
+};
 function Marquee({ children, red = false }) {
   return (
     <div className={"marquee " + (red ? "red" : "")}>
@@ -211,7 +217,8 @@ function App() {
   const [leaderboard, setLeaderboard] = useState(dailyDemoLeaderboard);
   const [leaderboardIsDemo, setLeaderboardIsDemo] = useState(true);
   const submitted = useRef(false);
-  const autopsyRef = useRef(null);
+  const shareCardRef = useRef(null);
+  const shareImageRef = useRef(null);
   const onChange = (e) => {
     startForm();
     const { name, type, checked, value } = e.target;
@@ -236,6 +243,29 @@ function App() {
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
+  useEffect(() => {
+    if (route !== "/roast" || !result) return undefined;
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        await document.fonts?.ready;
+        if (!shareCardRef.current) return;
+        const dataUrl = await toJpeg(shareCardRef.current, {
+          backgroundColor: "#000",
+          cacheBust: true,
+          pixelRatio: 1,
+          quality: 0.9,
+        });
+        if (!cancelled) shareImageRef.current = dataUrl;
+      } catch {
+        shareImageRef.current = null;
+      }
+    }, 250);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [result, route]);
   useEffect(() => {
     if (!isRoasting) return undefined;
     const timer = window.setInterval(() => {
@@ -400,38 +430,47 @@ function App() {
     setTimeout(() => setShareStatus(""), 2500);
   };
   const postToX = async () => {
-    const caption = `My startup just scored ${result.score}/100 on ROAST.MY.STARTUP. ${result.verdict.split(".")[0]}. Apparently confidence is not a business model. Think yours survives?`;
+    const caption = `My startup scored ${result.score}/100 on ROAST.MY.STARTUP and the autopsy was disrespectfully specific Think yours survives`;
+    const shareUrl = "https://roastmystartupnow.vercel.app";
+    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}&url=${encodeURIComponent(shareUrl)}`;
     const probe = new File(["roast"], "roast-my-startup.jpg", {
       type: "image/jpeg",
     });
     const canShareImage = Boolean(
       navigator.share && navigator.canShare?.({ files: [probe] }),
     );
-    const xWindow = canShareImage ? null : window.open("", "_blank");
-    if (xWindow) xWindow.opener = null;
+    if (!canShareImage) {
+      window.open(intent, "_blank", "noopener,noreferrer");
+    }
     setIsSharing(true);
-    setShareStatus("Developing photographic evidence…");
+    setShareStatus(
+      canShareImage
+        ? "Condensing the evidence for your share sheet…"
+        : "X opened in a new tab, condensing your image now…",
+    );
     try {
-      const dataUrl = await toJpeg(autopsyRef.current, {
-        backgroundColor: "#000",
-        cacheBust: true,
-        pixelRatio: 1,
-        quality: 0.86,
-        filter: (node) =>
-          !node.classList?.contains("share-roast") &&
-          !node.classList?.contains("actions") &&
-          !node.classList?.contains("signup-status") &&
-          !node.classList?.contains("autopsy-footnote"),
-      });
+      await document.fonts?.ready;
+      const dataUrl =
+        shareImageRef.current ||
+        (await toJpeg(shareCardRef.current, {
+          backgroundColor: "#000",
+          cacheBust: true,
+          pixelRatio: 1,
+          quality: 0.9,
+        }));
       const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "roast-my-startup.jpg", {
-        type: "image/jpeg",
-      });
+      const file = new File(
+        [blob],
+        `roast-my-startup-${result.score}-out-of-100.jpg`,
+        {
+          type: "image/jpeg",
+        },
+      );
       if (canShareImage) {
         await navigator.share({
           title: "My startup got roasted",
           text: caption,
-          url: "https://roastmystartupnow.vercel.app",
+          url: shareUrl,
           files: [file],
         });
         trackProductEvent("roast_shared", { channel: "x_image_share" });
@@ -441,16 +480,12 @@ function App() {
         download.href = dataUrl;
         download.download = file.name;
         download.click();
-        const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}&url=${encodeURIComponent("https://roastmystartupnow.vercel.app")}`;
-        if (xWindow) xWindow.location.href = intent;
-        else window.open(intent, "_blank", "noopener,noreferrer");
         trackProductEvent("roast_shared", { channel: "x_image_download" });
         setShareStatus(
           "Screenshot downloaded. Attach the evidence to your prefilled X post.",
         );
       }
     } catch (error) {
-      if (xWindow) xWindow.close();
       if (error.name !== "AbortError")
         setShareStatus(
           "The screenshot escaped. Try again before it gets funding.",
@@ -484,6 +519,7 @@ function App() {
     submitted.current = false;
     setFormStarted(false);
     setShareStatus("");
+    shareImageRef.current = null;
     setSignupStatus("");
     setRoastError("");
     setResult(null);
@@ -522,7 +558,7 @@ function App() {
             <Marquee red>
               💀 AUTOPSY COMPLETE 💀 DIAGNOSIS: TERMINAL 💀 NO SURVIVORS 💀
             </Marquee>
-            <div className="autopsy" ref={autopsyRef}>
+            <div className="autopsy">
               <div className="big-fire">🔥</div>
               <h2>THE FULL AUTOPSY</h2>
               <p>{result.greet}</p>
@@ -583,6 +619,47 @@ function App() {
                   </ol>
                 </section>
               )}
+              <aside
+                className="share-card-capture"
+                ref={shareCardRef}
+                aria-hidden="true"
+              >
+                <header>
+                  <span>
+                    ROAST<b>.</b>MY<b>.</b>STARTUP
+                  </span>
+                  <small>THE CONDENSED AUTOPSY</small>
+                </header>
+                <div className="share-card-capture__score">
+                  <strong>{result.score}</strong>
+                  <span>/100</span>
+                  <em>MOSTLY COOKED</em>
+                </div>
+                <section className="share-card-capture__verdict">
+                  <h2>{condense(result.verdictTitle, 70)}</h2>
+                  <p>{condense(result.verdict, 260)}</p>
+                </section>
+                <div className="share-card-capture__grid">
+                  {result.sections.map((section, index) => (
+                    <article
+                      style={{ background: section[1] }}
+                      key={`${section[0]}-${index}`}
+                    >
+                      <h3>{condense(section[0], 58)}</h3>
+                      <p>{condense(section[2])}</p>
+                    </article>
+                  ))}
+                  <article style={{ background: "#39ff14" }}>
+                    <h3>{condense(result.localTitle, 58)}</h3>
+                    <p>{condense(result.local)}</p>
+                  </article>
+                </div>
+                <section className="share-card-capture__final">
+                  <h2>☠️ PERSONAL CONCLUSION</h2>
+                  <p>{condense(result.final, 280)}</p>
+                </section>
+                <footer>ROASTMYSTARTUPNOW.VERCEL.APP</footer>
+              </aside>
               <section className="share-roast">
                 <h3>📢 SHARE YOUR L WITH THE WORLD</h3>
                 <p>Misery loves company. Drag your friends down here too. 😈</p>
