@@ -36,35 +36,6 @@
   resize: none;
 }
 
-.form-completion {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  height: 40px;
-  margin: -8px -8px 22px;
-  overflow: hidden;
-  color: #fff;
-  background: #000;
-  border: 4px solid #000;
-  box-shadow: 6px 6px var(--pink);
-  font: 900 15px/1 Arial, Helvetica, sans-serif;
-}
-
-.form-completion > span {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: linear-gradient(90deg, var(--red), var(--pink), var(--green));
-  transition: width 220ms ease-out;
-}
-
-.form-completion > b {
-  position: relative;
-  z-index: 1;
-  letter-spacing: 0.04em;
-  text-shadow: 2px 2px #000;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .hero-form-section input:hover,
   .hero-form-section textarea:hover,
@@ -81,9 +52,6 @@
     transition: none;
   }
 
-  .form-completion > span {
-    transition: none;
-  }
 }
 
 .signup-status {
@@ -109,9 +77,4 @@
     white-space: normal;
   }
 
-  .form-completion {
-    height: 36px;
-    margin-inline: -5px;
-    font-size: 13px;
-  }
 }

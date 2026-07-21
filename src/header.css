@@ -3,12 +3,41 @@
   top: 0;
   z-index: 100;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 7px;
   min-height: 72px;
   padding: 14px 20px;
   background: #000;
   border-bottom: 5px solid #39ff14;
+}
+
+.site-header__progress {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(720px, 92vw);
+  height: 22px;
+  overflow: hidden;
+  color: #fff;
+  background: #181818;
+  border: 2px solid #fff;
+  font: 900 12px/1 Arial, Helvetica, sans-serif;
+}
+
+.site-header__progress > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, #ff0040, #ff10f0, #39ff14);
+  transition: width 220ms ease-out;
+}
+
+.site-header__progress > b {
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.04em;
+  text-shadow: 2px 2px #000;
 }
 
 .site-header__brand {
@@ -77,12 +106,21 @@
   .hero-sub:hover {
     transform: rotate(-2deg);
   }
+
+  .site-header__progress > span {
+    transition: none;
+  }
 }
 
 @media (max-width: 560px) {
   .site-header {
     min-height: 58px;
     padding: 11px 14px;
+  }
+  .site-header__progress {
+    width: min(560px, 94vw);
+    height: 20px;
+    font-size: 11px;
   }
   .site-header__brand {
     font-size: clamp(26px, 9vw, 42px);

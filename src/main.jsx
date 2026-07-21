@@ -177,12 +177,30 @@ function Marquee({ children, red = false }) {
     </div>
   );
 }
-function SiteHeader() {
+function SiteHeader({ formProgress, remaining }) {
+  const showProgress = Number.isFinite(formProgress);
   return (
     <header className="site-header">
       <a className="site-header__brand" href="/">
         ROAST<span>.</span>MY<span>.</span>STARTUP
       </a>
+      {showProgress && (
+        <div
+          className="site-header__progress"
+          role="progressbar"
+          aria-label="Form completion"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow={formProgress}
+        >
+          <span style={{ width: `${formProgress}%` }} />
+          <b>
+            {formProgress === 100
+              ? "100% READY FOR IMPACT"
+              : `${formProgress}% READY • ${remaining} LEFT`}
+          </b>
+        </div>
+      )}
     </header>
   );
 }
@@ -818,7 +836,10 @@ function App() {
   return (
     <main>
       <Analytics />
-      <SiteHeader />
+      <SiteHeader
+        formProgress={formProgress}
+        remaining={requiredFields.length - completedFields}
+      />
       <Marquee>
         🔥 YOUR STARTUP SUCKS 🔥 GET DESTROYED 🔥 NO REFUNDS 🔥 YOUR MOM LIED TO
         YOU 🔥 WE FIND WHAT EVERYONE'S TOO POLITE TO MENTION 🔥
@@ -860,21 +881,6 @@ function App() {
         </p>
         <div id="roastform" className="form-section hero-form-section">
           <form onSubmit={submit}>
-            <div
-              className="form-completion"
-              role="progressbar"
-              aria-label="Form completion"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow={formProgress}
-            >
-              <span style={{ width: `${formProgress}%` }} />
-              <b>
-                {formProgress === 100
-                  ? "100% READY FOR IMPACT"
-                  : `${formProgress}% READY • ${requiredFields.length - completedFields} LEFT`}
-              </b>
-            </div>
             <label>💡 Your "revolutionary" idea *</label>
             <textarea
               name="idea"
